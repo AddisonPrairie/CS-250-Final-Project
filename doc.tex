@@ -1,0 +1,71 @@
+\documentclass{article}
+
+
+\usepackage{preamble}
+
+\title{Error Correcting Codes, Hardness Amplification and Boosting.}
+\date{}
+
+\begin{document}
+    
+\noindent Error Correcting Codes, Hardness Amplification and Boosting \hfill  CS 250, Winter 2025\\
+\hrule
+
+\section{Introduction}
+
+\section{Preliminaries}
+
+\section{Hardness Amplification with ECCs}
+
+\begin{definition}{3.x}
+    We say that a function $G : \pmo^s \rightarrow \pmo^{n}$ is an $(s, n)$-PRG if, for any size $n$ circuit $C$ over $n$ inputs, 
+    \begin{equation*}
+        \left|\Pr_{x \backsim U_n}[C(x)] - \Pr_{x \backsim U_s}[C(G(s))]\right| < \frac{1}{10}.
+    \end{equation*}
+\end{definition}
+
+The parameter $s$ is the seed length.
+
+\subsection{Why Hardness Amplification?}
+
+\begin{theorem}{3.x} Suppose that $G$ is a $(O(\log n), n)$-PRG computable in $\poly(n)$ time. Then $\P = \BPP$.
+\end{theorem}
+
+\subsubsection{A Simple PRG}
+
+\begin{theorem}{3.x}
+    Given the average case hardness assumption, there exists a $(n - 1, n)$-PRG.
+\end{theorem}
+
+\subsubsection{The Nisan-Wigderson Generator and BPP}
+
+\subsection{Worst to Average Case Hardness}
+
+\section{Boosting and Hardness Amplification}
+
+\subsection{Smooth Boosters and The Hardcore Theorem}
+
+\subsection{Boosting via the XOR Lemma}
+
+\section{One Shot Boosting with ECCs}
+
+\begin{theorem}{1.2.3}\label{t-1.2.3}
+    Theorem 1.2
+\end{theorem}
+    
+\begin{claim}{1.2}
+
+\end{claim}
+
+\begin{observation}{1.5}
+\end{observation}
+
+\begin{lemma}{1.5}
+\end{lemma}
+
+\begin{definition}{1.5}
+\end{definition}
+
+Note that \hyperref[t-1.2.3]{Theorem 1.2.3}
+
+\end{document}

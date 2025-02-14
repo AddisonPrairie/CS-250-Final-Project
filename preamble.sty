@@ -1,0 +1,78 @@
+\ProvidesPackage{cmds}
+
+\usepackage{fullpage,graphicx}
+\usepackage{amsmath,amsfonts,amsthm,amssymb,multirow, enumerate}
+\usepackage{tikz}\usepackage{mathtools}
+
+
+\usepackage{xcolor}
+\usepackage[colorlinks=true, linkcolor=blue, citecolor=red, urlcolor=magenta]{hyperref}
+
+\hypersetup{
+     colorlinks   = true,
+     citecolor    = blue
+}
+
+\newtheorem{theoremx}{Theorem}
+\newenvironment{theorem}[1]
+{\renewcommand\thetheoremx{#1}
+ \begin{theoremx}}
+{\end{theoremx}}
+
+\newtheorem{lemmax}{Lemma}
+\newenvironment{lemma}[1]
+{\renewcommand\thelemmax{#1}
+ \begin{lemmax}}
+{\end{lemmax}}
+
+\newtheorem{claimx}{Claim}
+\newenvironment{claim}[1]
+{\renewcommand\theclaimx{#1}
+ \begin{claimx}}
+{\end{claimx}}
+
+\newtheorem{factx}{Fact}
+\newenvironment{fact}[1]
+{\renewcommand\thefactx{#1}
+ \begin{factx}}
+{\end{factx}}
+
+\newtheorem{remarkx}{Remark}
+\newenvironment{remark}[1]
+{\renewcommand\theremarkx{#1}
+ \begin{remarkx}}
+{\end{remarkx}}
+
+\theoremstyle{definition}
+\newtheorem{definitionx}{Definition}
+\newenvironment{definition}[1]
+{\renewcommand\thedefinitionx{#1}
+ \begin{definitionx}}
+{\end{definitionx}}
+
+
+\theoremstyle{definition}
+\newtheorem{observationx}{Observation}
+\newenvironment{observation}[1]
+{\renewcommand\theobservationx{#1}
+ \begin{observationx}}
+{\end{observationx}}
+
+\newcommand{\pmo}{\{\pm 1\}}
+\newcommand{\pmon}{\pmo^n}
+\newcommand{\zo}{\{0, 1\}}
+\newcommand{\zon}{\zo^n}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cH}{\mathcal{H}}
+\newcommand{\enc}{\mathrm{Enc}}
+\newcommand{\dec}{\mathrm{Dec}}
+\newcommand{\Corr}{\mathrm{Corr}}
+\newcommand{\poly}{\mathrm{poly}}
+\renewcommand{\P}{\mathrm{P}}
+\newcommand{\BPP}{\mathrm{BPP}}
+
+
+\newcommand{\E}{\mathop{\mathbb{E}}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}

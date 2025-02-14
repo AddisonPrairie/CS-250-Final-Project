@@ -1,0 +1,48 @@
+# LaTeX auxiliary and temporary files
+*.aux
+*.log
+*.toc
+*.lof
+*.lot
+*.fls
+*.out
+*.nav
+*.snm
+*.vrb
+*.synctex.gz
+*.synctex(busy)
+*.fdb_latexmk
+*.blg
+*.bbl
+
+# Editor-specific files
+*.swp
+*.swo
+*~
+\#*
+*.bak
+*.backup
+
+# PDF and output files
+*.dvi
+*.ps
+*.pdf
+
+# Intermediate files
+*.idx
+*.ilg
+*.ind
+*.glg
+*.glo
+*.gls
+
+# Other build artifacts
+*.run.xml
+*.bcf
+
+# TeXShop (Mac)
+*.synctex.gz
+*.pdfsync
+
+# Overleaf / ShareLaTeX auxiliary files
+latex.out/
