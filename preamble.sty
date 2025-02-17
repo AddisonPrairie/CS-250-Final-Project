@@ -2,7 +2,13 @@
 
 \usepackage{fullpage,graphicx}
 \usepackage{amsmath,amsfonts,amsthm,amssymb,multirow, enumerate}
-\usepackage{tikz}\usepackage{mathtools}
+\usepackage{tikz}
+\usepackage{mathtools}
+\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{hobby}    
+\usetikzlibrary{patterns}
+
 
 
 \usepackage{xcolor}
@@ -57,6 +63,13 @@
 {\renewcommand\theobservationx{#1}
  \begin{observationx}}
 {\end{observationx}}
+
+\theoremstyle{definition}
+\newtheorem{assumptionx}{Assumption}
+\newenvironment{assumption}[1]
+{\renewcommand\theassumptionx{#1}
+ \begin{assumptionx}}
+{\end{assumptionx}}
 
 \newcommand{\pmo}{\{\pm 1\}}
 \newcommand{\pmon}{\pmo^n}
