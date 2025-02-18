@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[11pt]{article}
 
 
 \usepackage{preamble}
@@ -34,6 +34,13 @@ The parameter $\ell$ is the seed length.
 \end{assumption}
 
 \begin{assumption}{2} \label{a-2}
+    There exists a function $f : \pmon \rightarrow \pmo$ such that $f$ can be computed in time $2^{O(n)}$, but there exists some $\delta > 0$ such that 
+    \begin{equation*}
+        \Corr\left(f, 2^{\delta n}\right) < .9.
+    \end{equation*}
+\end{assumption}
+
+\begin{assumption}{3} \label{a-3}
     There exists a function $f : \pmon \rightarrow \pmo$ such that $f$ can be computed in time $2^{O(n)}$, but there exists some $\delta > 0$ such that 
     \begin{equation*}
         \Corr\left(f, 2^{\delta n}\right) < 2^{-\Omega(n)}.
@@ -138,23 +145,184 @@ We will prove that, given a worst case hard function $f$, we can transform it in
     \end{tikzpicture}
 \end{center}
 
-\subsection{Worst to Average Case Hardness}
+\subsection{Worst Case Hardness to Mild Hardness}
+
+\newpage
+
+\begin{theorem}{3.x}
+    Suppose that $\cC$ is an $[m^2, m, .1]_2$ code which is computable in $\poly(m)$ time and locally decodable in $\polylog (m)$ time. Then if $f$ satisfies the worst case hardness assumption, $\cC \concat f$ satisfies the mild hardness assumption.
+\end{theorem}
+
+\begin{proof}
+    Suppose that $f : \pmon \rightarrow \pmo$ satisfies the worst case hardness assumption. Writing $N = 2^n$, we can encode $f$ as a string $\TT(f) \in \pmo^{N}$ as its truth table. Then encoding $\TT(f)$ using $\cC$ to a string of length $N^2 = 2^{2n}$, we get can view this as a truth table for a function $\hat{f} : \pmo^{2n} \rightarrow \pmo$. We claim that if $f$ satisfies the worst case hardness assumption, $\hat{f}$ satisfies the mild hardness assumption. To prove that $\Corr(\hat{f}, S') \leq .9$, suppose for the sake of contradiction that $C$ is a circuit of size $S'$ with $\Corr(\hat{f}, C) > .9$. We will use this $C$ to construct a circuit $C'$ of size $S$ compute our original $f$ perfectly.
+
+    First, consider the truth table $\TT(C)$ of the function computed by the circuit $C$. Because $\Corr(\hat{f}, C) \geq .9$, the string $\TT(C)$ and $\TT(\hat{f})$ have relative distance $\delta(\TT(C), \TT(\hat{f})) < .05$, which is less than half the distance of the code $\cC$. Since $\TT(\hat{f})$ is the encoding of $\TT(f)$ under the code $\cC$, we can recover $\TT(f)$ from $\TT(C)$.
+
+    Suppose that $\LDec$ is the local list decoder for $\cC$ running in $\polylog(N) = \poly(n)$ time. Consider the following randomized circuit $C_{\sfrac{2}{3}}$ for computing $f(x)$.\\
+
+    \hrule 
+
+    \parbox{.4\linewidth}{%
+        \begin{center}
+            \begin{tikzpicture}
+
+                \draw [decorate,decoration={brace,amplitude=7.5pt}]
+        (0, .15) -- (4, 0.15) node[midway, yshift=.5cm]{$\TT(C)$};
+
+                \draw[] (0, -.1) rectangle (4, .1);
+
+                \draw[] (.2, -.2) -- (.2, -.4) -- (2, -.4);
+                \draw[fill=white] (.2, -.2) circle (.05cm);
+                \draw[] (1.5, -.2) -- (1.5, -.4);
+                \draw[fill=white] (1.5, -.2) circle (.05cm);
+                \draw[] (3.5, -.2) -- (3.5, -.4) -- (2, -.4);
+                \draw[fill=white] (3.5, -.2) circle (.05cm);
+                \draw[] (2.7, -.2) -- (2.7, -.4);
+                \draw[fill=white] (2.7, -.2) circle (.05cm);
+
+                \draw[->] (2, -.4) -- (2, -.6);
+
+                \node[] at (2, -.8) {$\LDec$};
+
+                
+
+                \draw[] (.2, -2) -- (.2, -2.2) -- (2, -2.2);
+                \draw[fill=white] (.2, -2) circle (.05cm);
+                \node[] at (.2, -1.75) {$C$};
+                \draw[] (1.5, -2) -- (1.5, -2.2);
+                \draw[fill=white] (1.5, -2) circle (.05cm);
+                \node[] at (1.5, -1.75) {$C$};
+                \draw[] (3.5, -2) -- (3.5, -2.2) -- (2, -2.2);
+                \draw[fill=white] (3.5, -2) circle (.05cm);
+                \node[] at (3.5, -1.75) {$C$};
+                \draw[] (2.7, -2) -- (2.7, -2.2);
+                \draw[fill=white] (2.7, -2) circle (.05cm);
+                \node[] at (2.7, -1.75) {$C$};
+
+                \draw[->] (2, -2.2) -- (2, -2.4);
+
+                \node[] at (2, -2.6) {$\LDec$};
+            \end{tikzpicture}
+        \end{center}
+    }
+    \hfill
+    \parbox{.5\linewidth}{%
+        \textbf{Input:} $x \in \pmo^n$
+        \begin{enumerate}
+            \item Compute $i$ such that $x$ is the $i$-th evaluation point in the truth table of $f$.
+            \item Return $\LDec^{\TT(C)}(i)$ using $C$ to simulate queries to $\TT(C)$.
+        \end{enumerate}
+    }
+
+    \hrule
+    \,
+
+    The size of $C_{\sfrac{1}{3}}$ is determined by the running time of $\LDec$ and the number of queries it makes to $\TT(C)$, both of which are polynomial in $n$. For each query that the local decoder $\LDec$ makes to $\TT(C)$, we'll need a copy of $C$ to compute this entry in the truth table; thus, the total size of $C_{\sfrac{1}{3}}$ is 
+    \begin{equation*}
+        |C_{\sfrac{1}{3}}| = \poly(n) \cdot |C| + \poly(n).
+    \end{equation*}
+    By the guarantees of our local decoding algorithm, for any input $x \in \pmon$, $\Pr[C_{\sfrac{1}{3}}(x) \neq f(x)] \leq \sfrac{1}{3}$, where this probability is over the random bits used by $C_{\sfrac{1}{3}}$. Since our goal is to compute $f$ perfectly, we can amplify the success probability by taking the majority over $O(n)$ copies of $C_{\sfrac{1}{3}}$ using independent random bits. This yields a circuit $C_{2^{-n}}$ of size $O(n \cdot |C_{\sfrac{1}{3}}|)$ such that $\Pr[C_{2^{-n}}(x) \neq f(x)] < 2^{-n}$. For a given setting of random bits $r$, write $C_{2^{-n}}^{(r)}$ to be a deterministic copy of $C_{2^{-n}}$ with fixed random bits. Then we can apply the union bound find to see
+    \begin{equation*}
+        \Pr_r\left[C^{(r)}_{2^{-n}}(x) = f(x) \text{ for all $x$}\right] \geq 1 - \sum_{x} \Pr_r\left[C^{(r)}_{2^{-n}}(x) = f(x)\right] > 1 - 2^{n} \cdot 2^{-n} = 0.
+    \end{equation*}
+    Thus, there must exist a particular $r$ such that $C^{(r)}_{2^{-n}}$ computes $f$ exactly. Note that the size of this circuit is 
+    \begin{equation*}
+        \left|C^{(r)}_{2^{-n}}\right| \leq O\left(n \cdot \poly(n) \cdot |C|\right) = \poly(n) \cdot 2^{\delta n / 2} \leq 2^{\delta n}.
+    \end{equation*}
+
+    The size of $C_{2/3}$ is determined by step $3$. For each query $\LDec$ makes to $\TT(C)$, we will need a copy of $C$, and so the total size of $C_{2/3}$ will be 
+    \begin{equation*}
+        |C_{2/3}| = \poly(n) \cdot |C|.
+    \end{equation*}
+    Moreover, for any $x \in \pmon$, the circuit $C_{2/3}$ will output $C(x)$ with probability $\sfrac{2}{3}$. We can write this as 
+    \begin{equation*}
+        \Pr_{r}[C_{\sfrac{2}{3}}(x, r) = f(x)] > \sfrac{2}{3}.
+    \end{equation*}
+    Where $r$ represents the random bits we feed $C$. By taking the majority over $O(n)$ copies of $C_{\sfrac{2}{3}}$, we can boost this success probality to greater than $1 - 2^{-n}$
+    \begin{equation*}
+        \Pr_{r} \left[\mathrm{MAJ} \left(C_{\sfrac{2}{3}}(x)\right) \neq f(x)\right] < 2^{-n}.
+    \end{equation*}
+    Thus, if we union bound over all $x \in \pmon$, we can find a particular fixing of our random bits $r$ such that $C'(x) = f(x)$ for all $x$.
+\end{proof}
+
+\begin{definition}{3.x}
+    The code $\cC$ will be the concatentation of a Reed-Solomon code $\RS$ with ... and a Hadamard Code
+\end{definition}
+
+\begin{center}
+    \begin{tikzpicture}
+
+        % first row
+        \draw [decorate,decoration={brace,amplitude=7.5pt}]
+        (-3, 0.15) -- (3, 0.15) node[midway, yshift=.5cm]{$x$};
+
+        \draw[] (-3, -.1) rectangle (3, .1);
+
+        \draw[] (-1.5, -.1) -- (-1.5, .1);
+        \draw [decorate,decoration={brace,amplitude=4pt, mirror}]
+        (-3, -.125) -- (-1.5, -.125) node[midway, yshift=-.4cm]{$f_1 \in \F$};
+        
+        \node[] at (0, -.5) {$\cdots$};
+
+        \draw[] (1.5, -.1) -- (1.5, .1); 
+        \draw [decorate,decoration={brace,amplitude=4pt, mirror}]
+        (1.5, -.125) -- (3, -.125) node[midway, yshift=-.4cm]{$f_? \in \F$};
+
+        \draw [decorate,decoration={brace,amplitude=4pt, mirror}]
+        (-3, -.75) -- (3, -.75);
+
+        \draw[->] (0, -.9) -- (0, -1.8);
+        \node[] at (.6, -1.35) {$\RS(f)$};
+    
+        % second row
+        \draw[] (-4, -2.1) rectangle (4, -1.9);
+
+        \draw[] (-2.5, -2.1) -- (-2.5, -1.9);
+
+        \draw [decorate,decoration={brace,amplitude=4pt, mirror}]
+        (-4, -2.125) -- (-2.5, -2.125) node[midway, yshift=-.4cm]{$w_1$};
+
+        \draw[] (-4, -2.2) -- (-6, -3.9);
+        \draw[] (-2.5, -2.2) -- (-3, -3.9);
+
+        \draw[->] (-3.5, -2.65) -- (-4.5, -3.8);
+
+        \node[fill=white] at (-4, -3.2) {$\Had(w_1)$};
+
+        \node[] at (0, -2.5) {$\cdots$};
+
+        \draw[] (2.5, -2.1) -- (2.5, -1.9);
+
+        \draw [decorate,decoration={brace,amplitude=4pt, mirror}]
+        (2.5, -2.125) -- (4, -2.125) node[midway, yshift=-.4cm]{$w_?$};
+
+        \draw[] (4, -2.2) -- (6, -3.9);
+        \draw[] (2.5, -2.2) -- (3, -3.9);
+
+        \draw[->] (3.5, -2.65) -- (4.5, -3.8);
+
+        \node[fill=white] at (4, -3.2) {$\Had(w_?)$};
+
+        % third row
+        \draw[] (-6, -4.1) rectangle (6, -3.9);
+
+        \draw[] (-3, -4.1) -- (-3, -3.9);
+
+        \draw[] (3, -4.1) -- (3, -3.9);
+
+        \draw [decorate,decoration={brace,amplitude=7.5pt, mirror}]
+        (-6, -4.15) -- (6, -4.15) node[midway, yshift=-.5cm]{$\Enc(x)$};
+
+    \end{tikzpicture}
+\end{center}
+
+\subsection{Worst Case Hardness to Average Case Hardness}
 
 \begin{theorem}{3.x}
     The average case hardness assumption implies the worst case hardness assumption.
 \end{theorem}
 
-\begin{center}
-    \begin{tikzpicture}
-        \draw[] (-.1, -1.5) rectangle (.1, 1.5);
-        \node[fill=white] at (0, 1.7) {$x$};
 
-        \draw[] (1.9, -2) rectangle (2.1, 2);
-
-
-        \draw[] (3.9, -2.5) rectangle (4.1, 2.5);
-    \end{tikzpicture}
-\end{center}
 
 \section{Boosting and Hardness Amplification}
 
