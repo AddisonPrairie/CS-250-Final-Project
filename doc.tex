@@ -154,13 +154,9 @@ We will prove that, given a worst case hard function $f$, we can transform it in
 \end{theorem}
 
 \begin{proof}
-    Suppose that $f : \pmon \rightarrow \pmo$ satisfies the worst case hardness assumption. Writing $N = 2^n$, we can encode $f$ as a string $\TT(f) \in \pmo^{N}$ as its truth table. Then encoding $\TT(f)$ using $\cC$ to a string of length $N^2 = 2^{2n}$, we get can view this as a truth table for a function $\hat{f} : \pmo^{2n} \rightarrow \pmo$. We claim that if $f$ satisfies the worst case hardness assumption, $\hat{f}$ satisfies the mild hardness assumption. To prove that $\Corr(\hat{f}, S') \leq .9$, suppose for the sake of contradiction that $C$ is a circuit of size $S'$ with $\Corr(\hat{f}, C) > .9$. We will use this $C$ to construct a circuit $C'$ of size $S$ compute our original $f$ perfectly.
+    Suppose that $f : \pmon \rightarrow \pmo$ satisfies the worst case hardness assumption, so that $f$ can be computed in time $2^{O(n)}$ yet, for some $\delta > 0$, $\Corr(f, 2^{\delta n}) < 1$. Writing $N = 2^n$, we can encode $f$ as a string $\TT(f) \in \pmo^{N}$ as its truth table. Then encoding $\TT(f)$ using $\cC$ to a string of length $N^2 = 2^{2n}$, we get can view this as a truth table for a function $\hat{f} : \pmo^{2n} \rightarrow \pmo$. We claim that if $f$ satisfies the worst case hardness assumption, $\hat{f}$ satisfies the mild hardness assumption. To prove that $\Corr(\hat{f}, 2^{n\delta/2}) \leq .9$, suppose for the sake of contradiction that $C$ is a circuit of size $2^{n \delta /2}$ with $\Corr(\hat{f}, C) > .9$. We will use this $C$ to construct a circuit $C'$ of size $S$ compute our original $f$ perfectly. First, consider the truth table $\TT(C)$ of the function computed by the circuit $C$. Because $\Corr(\hat{f}, C) > .9$, the string $\TT(C)$ and $\TT(\hat{f})$ have relative distance $\delta(\TT(C), \TT(\hat{f})) < .05$, which is less than half the distance of the code $\cC$. Since $\TT(\hat{f})$ is the encoding of $\TT(f)$ under the code $\cC$, we can recover $\TT(f)$ from $\TT(C)$.
 
-    First, consider the truth table $\TT(C)$ of the function computed by the circuit $C$. Because $\Corr(\hat{f}, C) \geq .9$, the string $\TT(C)$ and $\TT(\hat{f})$ have relative distance $\delta(\TT(C), \TT(\hat{f})) < .05$, which is less than half the distance of the code $\cC$. Since $\TT(\hat{f})$ is the encoding of $\TT(f)$ under the code $\cC$, we can recover $\TT(f)$ from $\TT(C)$.
-
-    Suppose that $\LDec$ is the local list decoder for $\cC$ running in $\polylog(N) = \poly(n)$ time. Consider the following randomized circuit $C_{\sfrac{2}{3}}$ for computing $f(x)$.\\
-
-    \hrule 
+    Suppose that $\LDec$ is the local decoder for $\cC$ running in $\polylog(N) = \poly(n)$ time. Consider the following randomized circuit $C_{\sfrac{2}{3}}$ for computing $f(x)$.
 
     \parbox{.4\linewidth}{%
         \begin{center}
@@ -214,36 +210,38 @@ We will prove that, given a worst case hard function $f$, we can transform it in
         \end{enumerate}
     }
 
-    \hrule
-    \,
-
     The size of $C_{\sfrac{1}{3}}$ is determined by the running time of $\LDec$ and the number of queries it makes to $\TT(C)$, both of which are polynomial in $n$. For each query that the local decoder $\LDec$ makes to $\TT(C)$, we'll need a copy of $C$ to compute this entry in the truth table; thus, the total size of $C_{\sfrac{1}{3}}$ is 
     \begin{equation*}
         |C_{\sfrac{1}{3}}| = \poly(n) \cdot |C| + \poly(n).
     \end{equation*}
     By the guarantees of our local decoding algorithm, for any input $x \in \pmon$, $\Pr[C_{\sfrac{1}{3}}(x) \neq f(x)] \leq \sfrac{1}{3}$, where this probability is over the random bits used by $C_{\sfrac{1}{3}}$. Since our goal is to compute $f$ perfectly, we can amplify the success probability by taking the majority over $O(n)$ copies of $C_{\sfrac{1}{3}}$ using independent random bits. This yields a circuit $C_{2^{-n}}$ of size $O(n \cdot |C_{\sfrac{1}{3}}|)$ such that $\Pr[C_{2^{-n}}(x) \neq f(x)] < 2^{-n}$. For a given setting of random bits $r$, write $C_{2^{-n}}^{(r)}$ to be a deterministic copy of $C_{2^{-n}}$ with fixed random bits. Then we can apply the union bound find to see
     \begin{equation*}
-        \Pr_r\left[C^{(r)}_{2^{-n}}(x) = f(x) \text{ for all $x$}\right] \geq 1 - \sum_{x} \Pr_r\left[C^{(r)}_{2^{-n}}(x) = f(x)\right] > 1 - 2^{n} \cdot 2^{-n} = 0.
+        \Pr_r\left[C^{(r)}_{2^{-n}}(x) = f(x) \text{ for all $x$}\right] \geq 1 - \sum_{x \in \pmon} \Pr_r\left[C^{(r)}_{2^{-n}}(x) = f(x)\right] > 1 - 2^{n} \cdot 2^{-n} = 0.
     \end{equation*}
     Thus, there must exist a particular $r$ such that $C^{(r)}_{2^{-n}}$ computes $f$ exactly. Note that the size of this circuit is 
     \begin{equation*}
         \left|C^{(r)}_{2^{-n}}\right| \leq O\left(n \cdot \poly(n) \cdot |C|\right) = \poly(n) \cdot 2^{\delta n / 2} \leq 2^{\delta n}.
     \end{equation*}
-
-    The size of $C_{2/3}$ is determined by step $3$. For each query $\LDec$ makes to $\TT(C)$, we will need a copy of $C$, and so the total size of $C_{2/3}$ will be 
-    \begin{equation*}
-        |C_{2/3}| = \poly(n) \cdot |C|.
-    \end{equation*}
-    Moreover, for any $x \in \pmon$, the circuit $C_{2/3}$ will output $C(x)$ with probability $\sfrac{2}{3}$. We can write this as 
-    \begin{equation*}
-        \Pr_{r}[C_{\sfrac{2}{3}}(x, r) = f(x)] > \sfrac{2}{3}.
-    \end{equation*}
-    Where $r$ represents the random bits we feed $C$. By taking the majority over $O(n)$ copies of $C_{\sfrac{2}{3}}$, we can boost this success probality to greater than $1 - 2^{-n}$
-    \begin{equation*}
-        \Pr_{r} \left[\mathrm{MAJ} \left(C_{\sfrac{2}{3}}(x)\right) \neq f(x)\right] < 2^{-n}.
-    \end{equation*}
-    Thus, if we union bound over all $x \in \pmon$, we can find a particular fixing of our random bits $r$ such that $C'(x) = f(x)$ for all $x$.
+    However, this contradicts the fact that $\Corr(f, 2^{\delta n}) < 1$. Thus, $\Corr(\hat{f}, 2^{n\delta / 2}) \leq .9$. Note also that $\hat{f}$ will still be computable in time $2^{O(n)}$. Thus $\hat{f}$ satisfies the mild hardness assumption.
 \end{proof}
+
+Thus, we have reduced the task of hardness amplification to finding a suitable error correcting code. In class, we have seen two locally correctable codes: Reed-Muller codes and Hadamard codes. As a reminder, here are the definitions and parameters of those two codes:
+
+\begin{definition}{3.x}[Reed-Muller Codes]
+    Suppose $\F$ is a finite field of size $q$. The Reed-Muller code $\RM_q(m, r)$ is the set of all evaluations of $r$-degree $m$-variate polynomials over $\F_q$,
+    \begin{equation*}
+        \RM_q(m ,r) = \left\{(f(\gamma_1), f(\gamma_2), \ldots, f(\gamma_{q^m})) : f \in \F_q[X_1, \ldots, X_m], \, \deg (f) \leq r\right\},
+    \end{equation*}
+    where $\gamma_1, \ldots, \gamma_{q^m}$ is a canonical ordering of $\F_q^m$. This code has dimension $k = \binom{m + r}{r}$, block length $n = q^m$, and distance $d = 1 - r / q$.
+\end{definition}
+
+Suppose we set $r = .9q$ and $m = O(q / \log q)$.
+
+\begin{definition}{3.x}[Hadamard Codes]
+
+    
+\end{definition}
+
 
 \begin{definition}{3.x}
     The code $\cC$ will be the concatentation of a Reed-Solomon code $\RS$ with ... and a Hadamard Code
@@ -272,7 +270,7 @@ We will prove that, given a worst case hard function $f$, we can transform it in
         (-3, -.75) -- (3, -.75);
 
         \draw[->] (0, -.9) -- (0, -1.8);
-        \node[] at (.6, -1.35) {$\RS(f)$};
+        \node[] at (.65, -1.35) {$\RM(f)$};
     
         % second row
         \draw[] (-4, -2.1) rectangle (4, -1.9);
