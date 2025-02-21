@@ -244,9 +244,20 @@ Thus, we have reduced the task of hardness amplification to finding a suitable e
 We had the following algorithm for locally correcting the Reed-Muller code:
 
 \begin{enumerate}
-    \item alg.
+    \item[Input:] Evaluation point $(\gamma_1, \ldots, \gamma_m) \in \F_q^m$, query access to $g : \F^m \rightarrow \F$ such that $\delta(g, f) \leq \sfrac{1}{7}$ for some codeword $f \in \RM_q(m, r)$.
+    \item[Output:] $f(\gamma_1, \ldots, \gamma_m)$ with probability $\geq \sfrac{2}{3}$.
+    \item Sample a uniform random $(\tau_1, \ldots, \tau_m) \backsim \F_q^m \setminus \{(0, \ldots, 0)\}$.
+    \item Define the line $\ell : \F_q \rightarrow \F_q^m$ by
+    \begin{equation*}
+        \ell(X) = \left(\gamma_1 + \tau_1 X, \ldots, \gamma_m + \tau_m X\right).
+    \end{equation*}
+    \item Consider the univariate polynomial degree $d$ polynomial $h(X)$ defined by 
+    \begin{equation*}
+        h(X) = f(\ell(X)).
+    \end{equation*}
+    \item Run a Reed-Solomon global decoder on $h(X)$ to obtain $\Tilde{h}(X)$ by querying $g(X)$.
+    \item Output $\Tilde{h}(0)$.
 \end{enumerate}
-
 Let's try to construct a code matching our requirements from a Reed-Muller code. What factors do we need? For starters, the number of queries our local correction algorithm makes is $q$, the size of the field, so we'll want this to be poly-logarithmic in $n$, say $q = \log^3 n$. We also want the block length $N$ to be $\poly(n)$. Thus, we should take $m = \log n / \log \log n$, so that 
 \begin{equation*}
     N = q^n = \left(\log^3 n\right)^{\log n / \log \log n} = 2^{3\log \log n \log n / \log \log n} = 2^{3\log n} = n^3.
@@ -358,7 +369,7 @@ We've established that this code has the parameters we need, but we've intention
 The reason this works is that the Hadamard code is \emph{systematic}: for every index $i \in [k]$ of a bit in a message, there exists an index $j \in [2^k]$ of a bit in the encoded codeword which is equal to the $i$-th bit in the message. To get a local decoding algorithm for Reed-Muller codes, we need to come up with a way to systematically encode them efficiently. This will be addressed in the next section. For now, lets assume that we have local decoders for both codes. Then we claim we have a local decoder for the concatenated code $\cC$:
 
 \begin{claim}{3.x}
-    The code $\cC$ is a $[n^4, n, \sfrac{3}{8}]_2$ code computable in $\poly(n)$ time with a local decoder running in $\polylog(n)$ time.
+    The code $\cC$ is a $[n^4, n, \sfrac{1}{14}]_2$ code computable in $\poly(n)$ time with a local decoder running in $\polylog(n)$ time.
 \end{claim}
 
 \subsubsection{Low Degree Extensions}
@@ -380,6 +391,8 @@ where the polynomial $\delta_\alpha : \F^m \rightarrow \F$ is defined as
 Note that the degree of this polynomial is 
 
 \subsection{Worst Case Hardness to Average Case Hardness}
+
+Note that in our analysis in Theorem 3.?, we could amplify the hardness of the any function $f$ to $1 - \delta$, where $\delta$ is the relative distance of the code $\cC$ at which we can locally decode it. However, since $\cC$ must be binary, $\delta \leq \sfrac{1}{2}$, and so local decoding can not get us to exponentially small correlation. To break past this barrier, we'll need to use the 
 
 \begin{theorem}{3.x}
     The average case hardness assumption implies the worst case hardness assumption.
@@ -426,7 +439,6 @@ Note that the degree of this polynomial is
 
 \subsection{Boosting via the XOR Lemma}
 
-\section{One Shot Boosting with ECCs}
 
 
 \end{document}
