@@ -154,113 +154,64 @@ We will prove that, given a worst case hard function $f$, we can transform it in
 \newpage
 
 \begin{theorem}{3.x}
-    Suppose that $\cC$ is an $[m^2, m, .1]_2$ code which is computable in $\poly(m)$ time and locally decodable in $\polylog (m)$ time. Then if $f$ satisfies the worst case hardness assumption, $\cC \concat f$ satisfies the mild hardness assumption.
+    Suppose that $\cC$ is a $[m^2, m]_2$ code with the following properties:
+    \begin{enumerate}
+        \item the encoding map $\Enc : \pmo^m \rightarrow \pmo^{m^2}$ is computable in $\poly(m)$ time,
+        \item there exists a local decoding algorithm $\LDec$ which can correct up to a relative distance of $.05$ running in $\polylog(m)$ time.
+    \end{enumerate}
+    Then the worst case hardness assumption implies the mild hardness assumption.
 \end{theorem}
 
 \begin{proof}
-    Suppose that $f : \pmon \rightarrow \pmo$ satisfies the worst case hardness assumption, so that $f$ can be computed in time $2^{O(n)}$ yet, for some $\delta > 0$, $\Corr(f, 2^{\delta n}) < 1$. Writing $N = 2^n$, we can encode $f$ as a string $\TT(f) \in \pmo^{N}$ as its truth table. Then encoding $\TT(f)$ using $\cC$ to a string of length $N^2 = 2^{2n}$, we get can view this as a truth table for a function $\hat{f} : \pmo^{2n} \rightarrow \pmo$. We claim that if $f$ satisfies the worst case hardness assumption, $\hat{f}$ satisfies the mild hardness assumption. To prove that $\Corr(\hat{f}, 2^{n\delta/2}) \leq .9$, suppose for the sake of contradiction that $C$ is a circuit of size $2^{n \delta /2}$ with $\Corr(\hat{f}, C) > .9$. We will use this $C$ to construct a circuit $C'$ of size $S$ compute our original $f$ perfectly. First, consider the truth table $\TT(C)$ of the function computed by the circuit $C$. Because $\Corr(\hat{f}, C) > .9$, the string $\TT(C)$ and $\TT(\hat{f})$ have relative distance $\delta(\TT(C), \TT(\hat{f})) < .05$, which is less than half the distance of the code $\cC$. Since $\TT(\hat{f})$ is the encoding of $\TT(f)$ under the code $\cC$, we can recover $\TT(f)$ from $\TT(C)$.
 
-    Suppose that $\LDec$ is the local decoder for $\cC$ running in $\polylog(N) = \poly(n)$ time. Consider the following randomized circuit $C_{\sfrac{2}{3}}$ for computing $f(x)$.
-
-    \parbox{.4\linewidth}{%
-        \begin{center}
-            \begin{tikzpicture}
-
-                \draw [decorate,decoration={brace,amplitude=7.5pt}]
-        (0, .15) -- (4, 0.15) node[midway, yshift=.5cm]{$\TT(C)$};
-
-                \draw[] (0, -.1) rectangle (4, .1);
-
-                \draw[] (.2, -.2) -- (.2, -.4) -- (2, -.4);
-                \draw[fill=white] (.2, -.2) circle (.05cm);
-                \draw[] (1.5, -.2) -- (1.5, -.4);
-                \draw[fill=white] (1.5, -.2) circle (.05cm);
-                \draw[] (3.5, -.2) -- (3.5, -.4) -- (2, -.4);
-                \draw[fill=white] (3.5, -.2) circle (.05cm);
-                \draw[] (2.7, -.2) -- (2.7, -.4);
-                \draw[fill=white] (2.7, -.2) circle (.05cm);
-
-                \draw[->] (2, -.4) -- (2, -.6);
-
-                \node[] at (2, -.8) {$\LDec$};
-
-                
-
-                \draw[] (.2, -2) -- (.2, -2.2) -- (2, -2.2);
-                \draw[fill=white] (.2, -2) circle (.05cm);
-                \node[] at (.2, -1.75) {$C$};
-                \draw[] (1.5, -2) -- (1.5, -2.2);
-                \draw[fill=white] (1.5, -2) circle (.05cm);
-                \node[] at (1.5, -1.75) {$C$};
-                \draw[] (3.5, -2) -- (3.5, -2.2) -- (2, -2.2);
-                \draw[fill=white] (3.5, -2) circle (.05cm);
-                \node[] at (3.5, -1.75) {$C$};
-                \draw[] (2.7, -2) -- (2.7, -2.2);
-                \draw[fill=white] (2.7, -2) circle (.05cm);
-                \node[] at (2.7, -1.75) {$C$};
-
-                \draw[->] (2, -2.2) -- (2, -2.4);
-
-                \node[] at (2, -2.6) {$\LDec$};
-            \end{tikzpicture}
-        \end{center}
-    }
-    \hfill
-    \parbox{.5\linewidth}{%
-        \textbf{Input:} $x \in \pmo^n$
-        \begin{enumerate}
-            \item Compute $i$ such that $x$ is the $i$-th evaluation point in the truth table of $f$.
-            \item Return $\LDec^{\TT(C)}(i)$ using $C$ to simulate queries to $\TT(C)$.
-        \end{enumerate}
-    }
-
-    The size of $C_{\sfrac{1}{3}}$ is determined by the running time of $\LDec$ and the number of queries it makes to $\TT(C)$, both of which are polynomial in $n$. For each query that the local decoder $\LDec$ makes to $\TT(C)$, we'll need a copy of $C$ to compute this entry in the truth table; thus, the total size of $C_{\sfrac{1}{3}}$ is 
+    Suppose that there exists a function $f : \pmon \rightarrow \pmo$ which can be computed in time $2^{O(n)}$ but, for some $\delta > 0$, 
     \begin{equation*}
-        |C_{\sfrac{1}{3}}| = \poly(n) \cdot |C| + \poly(n).
+        \Corr\left(f, 2^{\delta n}\right) < 1.
     \end{equation*}
-    By the guarantees of our local decoding algorithm, for any input $x \in \pmon$, $\Pr[C_{\sfrac{1}{3}}(x) \neq f(x)] \leq \sfrac{1}{3}$, where this probability is over the random bits used by $C_{\sfrac{1}{3}}$. Since our goal is to compute $f$ perfectly, we can amplify the success probability by taking the majority over $O(n)$ copies of $C_{\sfrac{1}{3}}$ using independent random bits. This yields a circuit $C_{2^{-n}}$ of size $O(n \cdot |C_{\sfrac{1}{3}}|)$ such that $\Pr[C_{2^{-n}}(x) \neq f(x)] < 2^{-n}$. For a given setting of random bits $r$, write $C_{2^{-n}}^{(r)}$ to be a deterministic copy of $C_{2^{-n}}$ with fixed random bits. Then we can apply the union bound find to see
+    Having $N = 2^n$, we can represent $f$ as a string of length $N$ by its truth table $\TT(f) \in \pmo^N$. Then when we encode this string using our code $\cC$, we can view the string $\Enc(\TT(f)) \in \pmo^{2N}$ as the truth table of a function $\TT(\hat{f})$, where $\hat{f} : \pmo^{2n} \rightarrow \pmo$. We claim that for some constant $\delta' > 0$,
     \begin{equation*}
-        \Pr_r\left[C^{(r)}_{2^{-n}}(x) = f(x) \text{ for all $x$}\right] \geq 1 - \sum_{x \in \pmon} \Pr_r\left[C^{(r)}_{2^{-n}}(x) = f(x)\right] > 1 - 2^{n} \cdot 2^{-n} = 0.
+        \Corr\left(\hat{f}, 2^{\delta' n}\right) \leq .9.
     \end{equation*}
-    Thus, there must exist a particular $r$ such that $C^{(r)}_{2^{-n}}$ computes $f$ exactly. Note that the size of this circuit is 
+    To prove this, suppose for the sake of contradiction that there existed a circuit $C$ of size $2^{\delta' n}$ with correlation $\geq .9$ with $\hat{f}$. We will use $C$ to construct a circuit perfectly computing $f$. To start, consider the truth table $\TT(C)$ of the function computed by $C$. Because $C$ achieves high correlation with $\hat{f}$, the relative distance between $\TT(C)$ and $\TT(\hat{f})$ must be small,
     \begin{equation*}
-        \left|C^{(r)}_{2^{-n}}\right| \leq O\left(n \cdot \poly(n) \cdot |C|\right) = \poly(n) \cdot 2^{\delta n / 2} \leq 2^{\delta n}.
+        \delta\left(\TT(C), \TT(\hat{f})\right) < .05.
     \end{equation*}
-    However, this contradicts the fact that $\Corr(f, 2^{\delta n}) < 1$. Thus, $\Corr(\hat{f}, 2^{n\delta / 2}) \leq .9$. Note also that $\hat{f}$ will still be computable in time $2^{O(n)}$. Thus $\hat{f}$ satisfies the mild hardness assumption.
+    Thus, if we give our local decoder $\LDec$ for $\cC$ query access to $\TT(C)$, it will with probability $\sfrac{2}{3}$ output any particular bit of $\TT(f)$ in $\polylog(N) = \poly(n)$ time. Consider the following randomized circuit $C_{\sfrac{2}{3}}$ which computes $f$ with probability $\sfrac{2}{3}$. On input $x \in \pmon$, run the local decoder on $x$, simulating query access to $\TT(C)$ by querying the circuit $C$ itself,
+    \begin{equation*}
+        C_{\sfrac{2}{3}}(x) = \LDec^{\TT(C)}(x).
+    \end{equation*}
+    The size of $C_{\sfrac{2}{3}}$ depends on the running time and query complexity of $\LDec$, since each query to $\TT(C)$ is simulated by an independent copy of $C$. Since both of these quantities are $\poly(n)$, we see that 
+    \begin{equation*}
+        |C_{\sfrac{2}{3}}|  \leq \poly(n) + \poly(n) |C| \leq 2^{(\delta' + o(1))n}.
+    \end{equation*}
+    Using the fact that circuits can be derandomized with only a polynomial blow up in size, we can obtain a circuit $C'$ of size $2^{(\delta' + o(1))n}$ compute $f$ exactly. Taking $\delta' = \delta / 3$, this would contradict the fact that $f$ cannot be computed exactly by circuits of size $2^{\delta n}$. Thus, it must be true that 
+    \begin{equation*}
+        \Corr\left(\hat{f}, 2^{\delta n / 3}\right) \leq .9.
+    \end{equation*}
+    The last thing we must verify is that $\hat{f}$ can still be computed in time $2^{O(n)} = \poly(N)$. Since our encoding map $\Enc$ and $f$ are both computable in $\poly(N)$ time, $\hat{f}$ will be as well.
 \end{proof}
 
 \subsubsection{Reed-Muller and Hadamard Codes}
 
-Thus, we have reduced the task of hardness amplification to finding a suitable error correcting code. In class, we have seen two locally correctable codes: Reed-Muller codes and Hadamard codes. As a reminder, here are the definitions and parameters of those two codes:
+Theorem 3.x reduces the task of hardness amplification to finding a suitable error correcting code. The most important property of this code is that it is locally decodable. As a starting point, let's take a look at a code which has good rate, distance and is locally correctable: the Reed-Muller code.
 
 \begin{definition}{3.x}[Reed-Muller Codes]
     Suppose $\F$ is a finite field of size $q$. The Reed-Muller code $\RM_q(m, d)$ is the set of all evaluations of $d$-degree $m$-variate polynomials over $\F_q$,
     \begin{equation*}
         \RM_q(m ,r) = \left\{(f(\gamma_1), f(\gamma_2), \ldots, f(\gamma_{q^m})) : f \in \F_q[X_1, \ldots, X_m], \, \deg (f) \leq d\right\},
     \end{equation*}
-    where $\gamma_1, \ldots, \gamma_{q^m}$ is a canonical ordering of $\F_q^m$. This code has dimension $k = \binom{m + d}{d}$, block length $N = q^m$, and relative distance $\delta = 1 - d/ q$.
+    where $\gamma_1, \ldots, \gamma_{q^m}$ is a canonical ordering of $\F_q^m$. This code has dimension $k = \binom{m + d}{d}$, block length $q^m$, and relative distance $\delta = 1 - d/ q$.
 \end{definition}
 
-We had the following algorithm for locally correcting the Reed-Muller code:
+In class, we saw the following guarantees for locally correcting the Reed-Muller code.
 
-\begin{enumerate}
-    \item[Input:] Evaluation point $(\gamma_1, \ldots, \gamma_m) \in \F_q^m$, query access to $g : \F^m \rightarrow \F$ such that $\delta(g, f) \leq \sfrac{1}{7}$ for some codeword $f \in \RM_q(m, r)$.
-    \item[Output:] $f(\gamma_1, \ldots, \gamma_m)$ with probability $\geq \sfrac{2}{3}$.
-    \item Sample a uniform random $(\tau_1, \ldots, \tau_m) \backsim \F_q^m \setminus \{(0, \ldots, 0)\}$.
-    \item Define the line $\ell : \F_q \rightarrow \F_q^m$ by
-    \begin{equation*}
-        \ell(X) = \left(\gamma_1 + \tau_1 X, \ldots, \gamma_m + \tau_m X\right).
-    \end{equation*}
-    \item Consider the univariate polynomial degree $d$ polynomial $h(X)$ defined by 
-    \begin{equation*}
-        h(X) = f(\ell(X)).
-    \end{equation*}
-    \item Run a Reed-Solomon global decoder on $h(X)$ to obtain $\Tilde{h}(X)$ by querying $g(X)$.
-    \item Output $\Tilde{h}(0)$.
-\end{enumerate}
-Let's try to construct a code matching our requirements from a Reed-Muller code. What factors do we need? For starters, the number of queries our local correction algorithm makes is $q$, the size of the field, so we'll want this to be poly-logarithmic in $n$, say $q = \log^3 n$. We also want the block length $N$ to be $\poly(n)$. Thus, we should take $m = \log n / \log \log n$, so that 
+\begin{claim}{3.x}
+    There exists a local corrector $\LCor_\RM$ for the Reed-Muller code $\RM_q(m, r)$ which locally corrects up to a relative distance of $\delta \leq \sfrac{1}{7}$ with $q$ queries in time $\poly(m, q, r)$.
+\end{claim}
+
+For a second, let's put aside the fact that we can only locally correct, rather than decode, this code, and let's also ignore the fact that it is a binary code. How should we pick $d$, $q$ and $m$ to achieve the regime required by Theorem 3.x? As a start, we need the number of queries to be poly-logarithmic in $n$, say $q = \log^3 n$. We'll also want the block length to be $\poly(n)$. Thus, we should take $m = \log n / \log \log n$, so that the block length is 
 \begin{equation*}
-    N = q^n = \left(\log^3 n\right)^{\log n / \log \log n} = 2^{3\log \log n \log n / \log \log n} = 2^{3\log n} = n^3.
+    q^n = \left(\log^3 n\right)^{\log n / \log \log n} = 2^{3\log \log n \log n / \log \log n} = 2^{3\log n} = n^3.
 \end{equation*}
 Next, we need the dimension $k$ to be at least $n$, so that we can encode an entire string of length $n$. See that 
 \begin{equation*}
@@ -270,9 +221,7 @@ In this case, we need to take $d = \log^2 n$, so that
 \begin{equation*}
     k \geq \left(\frac{\log^2 n \log \log n}{\log n}\right)^{\log n / \log \log n} \geq \left(\log n\right)^{\log n / \log \log n} \geq n.
 \end{equation*}
-In this case, the distance is $\delta = 1 - d / q = 1 - 1 / \log n$. To keep things simple, we'll just note that $\delta \geq \sfrac{3}{4}$. Let's call this code, with the parameters above, $\RM$. To summarize, we have that $\RM$ is a $[n^3, n, \sfrac{3}{4}]_\F$ code, where $\F$ is a finite field of size $\log^3 n$. Does this complete our search?
-
-Note quite. For one, this is not a binary code, meaning we cannot apply it quite yet. In order to transform it into a binary code, we can concatenate it with another code which is locally correctible: the Hadamard code.
+Finally, the distance is $\delta = 1 - d / q = 1 - 1 / \log n$; however, since we can only locally decode up to a distance of $\delta \leq \sfrac{1}{7}$, we will take that as our distance instead. Let's call this code, with the parameters above, $\RM$. To summarize, we have that $\RM$ is a $[n^3, n, \sfrac{1}{7}]_\F$ code, where $\F$ is a finite field of size $\log^3 n$. To convert this to a binary code, we can concatenate with another code which is locally correctible: the Hadamard code.
 
 \begin{definition}{3.x}[Hadamard Codes]
     The Hadamard code $\Had_k \subseteq \pmo^{2^k}$ with parameter $k$ is the subset of truth tables of linear functions from $\pmo^k$ to $\pmo$:
@@ -282,84 +231,28 @@ Note quite. For one, this is not a binary code, meaning we cannot apply it quite
     This code has dimension $k$, block length $2^k$, and relative distance $\delta = \sfrac{1}{2}$.
 \end{definition}
 
-Fixing $k = \log |\F|$, we will write $\Had$ for the Hadamard code with parameter $k$. Consider the concatenated code $\cC = \Had \concat \RM$. 
+In class, we saw the following guarantees for locally correcting the Hadamard code.
 
 \begin{claim}{3.x}
-    The code $\cC = \Had \concat \RM$ is a $[n^4, n, \sfrac{3}{8}]_2$ code.
+    There exists a local corrector $\LCor_\Had$ for the Hadamard code $\Had_k$ which locally corrects up to a relative distance of $\delta \leq \sfrac{1}{4}$ with $2$ queries in time $O(k)$.
+\end{claim}
+
+Fixing $k = \log |\F|$, we will write $\Had$ for the Hadamard code with parameter $k$. Let's suppose for a second that we could transform each of our local correcting algorithms to local decoding algorithms. Then we claim that the concatenated code $\cC = \Had \concat \RM$ will satisfy the requirements of Theorem 3.x.
+
+\begin{claim}{3.x}
+    The code $\cC$ is a $[n^4, n, \sfrac{1}{28}]_2$ code which can be locally decoded in $\polylog(n)$ time.
 \end{claim}
 
 \begin{proof}
-    First, we know that the distance of the two codes is the product of their individual distances, so we indeed get $\delta = \sfrac{3}{8}$. The dimension of the code is still $n$. To compute the block length, see that every ``bit'' of a codeword $c \in \RM$ will be replaced by a string of length $2^{\log |\F|} = |\F| = \log^3 n$, and so the total length of the resulting word is $n^3 \cdot \log^3 n \leq n^4$.
+    Let's begin by verifying the parameters of the code. The dimension will still by $n$, and the distance will be the product of the distances, so that $\delta = \sfrac{1}{28}$. To compute the block length, see that every symbol of a codeword $c \in \RM$ is encoded to a Hadamard codeword of length $2^{\log |\F|} = |\F| = \log^3 n$, so that the total length of the resulting word is $n^3 \cdot \log^3 n \leq n^4$. Thus, $\cC$ is indeed a $[n^4, n, \sfrac{1}{28}]_2$ code.
+
+    Next, we claim that $\cC$ can be locally decoded in time $\polylog(n)$. Suppose that $c \in \cC$ and $\tilde{c}$ is a corrupted codeword such that $\delta(c, \tilde{c}) \leq \sfrac{1}{28}$. The algorithm for locally recovering $c$ from $\tilde{c}$ runs as follows. Run the local decoder $\LDec_\RM$ on the Reed-Muller code word represented by $\tilde{c}$, replacing each query to this code word with a call to the local decoder $\LDec_\Had$ with query access to $\tilde{c}$.
+
+    To see why this is a good idea, consider that since $\delta(c, \tilde{c}) \leq \sfrac{1}{28}$, there can be at most a $\sfrac{1}{7}$ blocks of Hadamard codewords which are corrupted beyond a distance of $\sfrac{1}{4}$. Thus the local decoder $\LDec_\Had$ with be able to decode a $1 - \sfrac{1}{7}$ fraction of these blocks. Therefore, the codeword which $\LDec_\RM$ queries will have distance at most $\sfrac{1}{7}$ from the polynomial represented by $c$, and thus it will locally decode $c$ with high probability.
+    
+    Note that this will still run in time poly-logarithmic in $n$. Furthermore, we can boost the success probability of each decoder by repetition by sacrificing only a small increase in run time, and thus the process above can be made to succeed with probability $\sfrac{2}{3}$. Thus, $\cC$ can be locally decoded in $\polylog(n)$ time.
 \end{proof}
 
-Here is a picture of what is going on with our code:
-
-\begin{center}
-    \begin{tikzpicture}
-
-        % first row
-        \draw [decorate,decoration={brace,amplitude=7.5pt}]
-        (-3, 0.15) -- (3, 0.15) node[midway, yshift=.5cm]{$x \in \pmo^n$};
-
-        \draw[] (-3, -.1) rectangle (3, .1);
-
-        \draw[] (-1.5, -.1) -- (-1.5, .1);
-        \draw [decorate,decoration={brace,amplitude=4pt, mirror}]
-        (-3, -.125) -- (-1.5, -.125) node[midway, yshift=-.4cm]{$f_1 \in \F$};
-        
-        \node[] at (0, -.5) {$\cdots$};
-
-        \draw[] (1.5, -.1) -- (1.5, .1); 
-        \draw [decorate,decoration={brace,amplitude=4pt, mirror}]
-        (1.5, -.125) -- (3, -.125) node[midway, yshift=-.4cm]{$f_n \in \F$};
-
-        \draw [decorate,decoration={brace,amplitude=4pt, mirror}]
-        (-3, -.75) -- (3, -.75);
-
-        \draw[->] (0, -.9) -- (0, -1.8);
-        \node[] at (.65, -1.35) {$\RM(x)$};
-    
-        % second row
-        \draw[] (-4, -2.1) rectangle (4, -1.9);
-
-        \draw[] (-2.5, -2.1) -- (-2.5, -1.9);
-
-        \draw [decorate,decoration={brace,amplitude=4pt, mirror}]
-        (-4, -2.125) -- (-2.5, -2.125) node[midway, yshift=-.4cm]{$w_1$};
-
-        \draw[] (-4, -2.2) -- (-6, -3.9);
-        \draw[] (-2.5, -2.2) -- (-3, -3.9);
-
-        \draw[->] (-3.5, -2.65) -- (-4.5, -3.8);
-
-        \node[fill=white] at (-4, -3.2) {$\Had(w_1)$};
-
-        \node[] at (0, -2.5) {$\cdots$};
-
-        \draw[] (2.5, -2.1) -- (2.5, -1.9);
-
-        \draw [decorate,decoration={brace,amplitude=4pt, mirror}]
-        (2.5, -2.125) -- (4, -2.125) node[midway, yshift=-.4cm]{$w_{n^3}$};
-
-        \draw[] (4, -2.2) -- (6, -3.9);
-        \draw[] (2.5, -2.2) -- (3, -3.9);
-
-        \draw[->] (3.5, -2.65) -- (4.5, -3.8);
-
-        \node[fill=white] at (4, -3.2) {$\Had(w_{n^3})$};
-
-        % third row
-        \draw[] (-6, -4.1) rectangle (6, -3.9);
-
-        \draw[] (-3, -4.1) -- (-3, -3.9);
-
-        \draw[] (3, -4.1) -- (3, -3.9);
-
-        \draw [decorate,decoration={brace,amplitude=7.5pt, mirror}]
-        (-6, -4.15) -- (6, -4.15) node[midway, yshift=-.5cm]{$\Enc(x)\in \pmo^{n^3}$};
-
-    \end{tikzpicture}
-\end{center}
 We've established that this code has the parameters we need, but we've intentionally been a bit vague on what encoding scheme we will use for our Reed-Muller and Hadamard codes. The reason for this is that, while we've seen that both of these codes are locally \emph{correctable} codes, for Theorem ?? to work, we require locally \emph{decodable} codes. In the case of the Hadamard code, we can recover an algorithm for local decoding from our algorithm for local correcting.
 
 \begin{claim}{3.x}
@@ -372,7 +265,7 @@ The reason this works is that the Hadamard code is \emph{systematic}: for every 
     The code $\cC$ is a $[n^4, n, \sfrac{1}{14}]_2$ code computable in $\poly(n)$ time with a local decoder running in $\polylog(n)$ time.
 \end{claim}
 
-\subsubsection{Low Degree Extensions}
+\subsubsection{Systematic Encodings and Low Degree Extensions}
 
 Consider that any string $x \in \pmon$ can be viewed as the truth table of a function $f_x : \pmo^{\log n} \rightarrow \pmo$. We want to transform this into into a code word $\hat{f}_x$ in our Reed-Muller code. In this case, the requirements on $\hat{f}_x$ are:
 \begin{enumerate}
@@ -392,7 +285,7 @@ Note that the degree of this polynomial is
 
 \subsection{Worst Case Hardness to Average Case Hardness}
 
-Note that in our analysis in Theorem 3.?, we could amplify the hardness of the any function $f$ to $1 - \delta$, where $\delta$ is the relative distance of the code $\cC$ at which we can locally decode it. However, since $\cC$ must be binary, $\delta \leq \sfrac{1}{2}$, and so local decoding can not get us to exponentially small correlation. To break past this barrier, we'll need to use the 
+Note that in our analysis in Theorem 3.?, we could amplify the hardness of the any function $f$ to $1 - \delta$, where $\delta$ is the relative distance of the code $\cC$ at which we can locally decode it. However, since $\cC$ must be binary, $\delta \leq \sfrac{1}{2}$, and so local decoding can not get us to exponentially small correlation. To break past this barrier, we can use list decoding. 
 
 \begin{theorem}{3.x}
     The average case hardness assumption implies the worst case hardness assumption.

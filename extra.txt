@@ -1,0 +1,122 @@
+concatenated code diagram:
+
+\begin{center}
+    \begin{tikzpicture}
+
+        % first row
+        \draw [decorate,decoration={brace,amplitude=7.5pt}]
+        (-3, 0.15) -- (3, 0.15) node[midway, yshift=.5cm]{$x \in \pmo^n$};
+
+        \draw[] (-3, -.1) rectangle (3, .1);
+
+        \draw[] (-1.5, -.1) -- (-1.5, .1);
+        \draw [decorate,decoration={brace,amplitude=4pt, mirror}]
+        (-3, -.125) -- (-1.5, -.125) node[midway, yshift=-.4cm]{$f_1 \in \F$};
+        
+        \node[] at (0, -.5) {$\cdots$};
+
+        \draw[] (1.5, -.1) -- (1.5, .1); 
+        \draw [decorate,decoration={brace,amplitude=4pt, mirror}]
+        (1.5, -.125) -- (3, -.125) node[midway, yshift=-.4cm]{$f_n \in \F$};
+
+        \draw [decorate,decoration={brace,amplitude=4pt, mirror}]
+        (-3, -.75) -- (3, -.75);
+
+        \draw[->] (0, -.9) -- (0, -1.8);
+        \node[] at (.65, -1.35) {$\RM(x)$};
+    
+        % second row
+        \draw[] (-4, -2.1) rectangle (4, -1.9);
+
+        \draw[] (-2.5, -2.1) -- (-2.5, -1.9);
+
+        \draw [decorate,decoration={brace,amplitude=4pt, mirror}]
+        (-4, -2.125) -- (-2.5, -2.125) node[midway, yshift=-.4cm]{$w_1$};
+
+        \draw[] (-4, -2.2) -- (-6, -3.9);
+        \draw[] (-2.5, -2.2) -- (-3, -3.9);
+
+        \draw[->] (-3.5, -2.65) -- (-4.5, -3.8);
+
+        \node[fill=white] at (-4, -3.2) {$\Had(w_1)$};
+
+        \node[] at (0, -2.5) {$\cdots$};
+
+        \draw[] (2.5, -2.1) -- (2.5, -1.9);
+
+        \draw [decorate,decoration={brace,amplitude=4pt, mirror}]
+        (2.5, -2.125) -- (4, -2.125) node[midway, yshift=-.4cm]{$w_{n^3}$};
+
+        \draw[] (4, -2.2) -- (6, -3.9);
+        \draw[] (2.5, -2.2) -- (3, -3.9);
+
+        \draw[->] (3.5, -2.65) -- (4.5, -3.8);
+
+        \node[fill=white] at (4, -3.2) {$\Had(w_{n^3})$};
+
+        % third row
+        \draw[] (-6, -4.1) rectangle (6, -3.9);
+
+        \draw[] (-3, -4.1) -- (-3, -3.9);
+
+        \draw[] (3, -4.1) -- (3, -3.9);
+
+        \draw [decorate,decoration={brace,amplitude=7.5pt, mirror}]
+        (-6, -4.15) -- (6, -4.15) node[midway, yshift=-.5cm]{$\Enc(x)\in \pmo^{n^3}$};
+
+    \end{tikzpicture}
+\end{center}
+
+Worst to mild hardness alg
+
+\parbox{.4\linewidth}{%
+        \begin{center}
+            \begin{tikzpicture}
+
+                \draw [decorate,decoration={brace,amplitude=7.5pt}]
+        (0, .15) -- (4, 0.15) node[midway, yshift=.5cm]{$\TT(C)$};
+
+                \draw[] (0, -.1) rectangle (4, .1);
+
+                \draw[] (.2, -.2) -- (.2, -.4) -- (2, -.4);
+                \draw[fill=white] (.2, -.2) circle (.05cm);
+                \draw[] (1.5, -.2) -- (1.5, -.4);
+                \draw[fill=white] (1.5, -.2) circle (.05cm);
+                \draw[] (3.5, -.2) -- (3.5, -.4) -- (2, -.4);
+                \draw[fill=white] (3.5, -.2) circle (.05cm);
+                \draw[] (2.7, -.2) -- (2.7, -.4);
+                \draw[fill=white] (2.7, -.2) circle (.05cm);
+
+                \draw[->] (2, -.4) -- (2, -.6);
+
+                \node[] at (2, -.8) {$\LDec$};
+
+                
+
+                \draw[] (.2, -2) -- (.2, -2.2) -- (2, -2.2);
+                \draw[fill=white] (.2, -2) circle (.05cm);
+                \node[] at (.2, -1.75) {$C$};
+                \draw[] (1.5, -2) -- (1.5, -2.2);
+                \draw[fill=white] (1.5, -2) circle (.05cm);
+                \node[] at (1.5, -1.75) {$C$};
+                \draw[] (3.5, -2) -- (3.5, -2.2) -- (2, -2.2);
+                \draw[fill=white] (3.5, -2) circle (.05cm);
+                \node[] at (3.5, -1.75) {$C$};
+                \draw[] (2.7, -2) -- (2.7, -2.2);
+                \draw[fill=white] (2.7, -2) circle (.05cm);
+                \node[] at (2.7, -1.75) {$C$};
+
+                \draw[->] (2, -2.2) -- (2, -2.4);
+
+                \node[] at (2, -2.6) {$\LDec$};
+            \end{tikzpicture}
+        \end{center}
+    }
+    \hfill
+    \parbox{.5\linewidth}{%
+        \textbf{Input:} $x \in \pmo^n$
+        \begin{enumerate}
+            \item Compute $i$ such that $x$ is the $i$-th evaluation point in the truth table of $f$.
+            \item Return $\LDec^{\TT(C)}(i)$ using $C$ to simulate queries to $\TT(C)$.
+        \end{enumerate}
+    }
