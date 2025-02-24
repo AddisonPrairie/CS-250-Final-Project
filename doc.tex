@@ -21,15 +21,6 @@
 
 \section{Hardness Amplification with ECCs}
 
-\begin{definition}{3.x}
-    We say that a function $G : \pmo^\ell \rightarrow \pmo^{n}$ is an $(\ell, n)$-PRG if, for any size $n$ circuit $C$ over $n$ inputs, 
-    \begin{equation*}
-        \left|\Pr_{x \backsim U_n}[C(x)] - \Pr_{x \backsim U_s}[C(G(s))]\right| < \frac{1}{10}.
-    \end{equation*}
-\end{definition}
-
-The parameter $\ell$ is the seed length.
-
 \begin{assumption}{1} \label{a-1}
     There exists a function $f : \pmon \rightarrow \pmo$ such that $f$ can be computed in time $2^{O(n)}$, but there exists some $\delta > 0$ such that 
     \begin{equation*}
@@ -59,6 +50,13 @@ We will prove that, given a worst case hard function $f$, we can transform it in
 
 \subsection{Why Hardness Amplification?}
 
+\begin{definition}{3.x}
+    We say that a function $G : \pmo^\ell \rightarrow \pmo^{n}$ is an $(\ell, n)$-PRG if, for any size $n$ circuit $C$ over $n$ inputs, 
+    \begin{equation*}
+        \left|\Pr_{x \backsim U_n}[C(x)] - \Pr_{x \backsim U_s}[C(G(s))]\right| < \frac{1}{10}.
+    \end{equation*}
+\end{definition}
+
 \begin{theorem}{3.x} Suppose that $G$ is a $(O(\log n), n)$-PRG computable in $\poly(n)$ time. Then $\P = \BPP$.
 \end{theorem}
 
@@ -67,6 +65,21 @@ We will prove that, given a worst case hard function $f$, we can transform it in
 \begin{theorem}{3.x}
     Given the average case hardness assumption, there exists a $(n - 1, n)$-PRG.
 \end{theorem}
+
+To prove this . Intuitively, it says that if no small circuit can predict the $i$-th bit of our PRG given the first $i - 1$ bits, then no small circuit can distinguish $G$ from truly random bits. This will reduce the task of analyzing a circuit fed our entire PRG output to analyzing a circuit on just one bit.
+
+\begin{lemma}{3.x}[Yao's Next Bit Prediction Lemma]
+    Write $G(s) = (z_1, \ldots, z_n)$. Suppose that for all $i \in [n]$, any circuit $C : \pmo^{i - 1} \rightarrow \pmo$ of size $n$ has 
+    \begin{equation*}
+        \Corr\left(C(z_1, \ldots, z_{i - 1}), z_i\right) < \frac{\epsilon}{n}.
+    \end{equation*}
+    Then for any $C : \pmo^n \rightarrow \pmo$ of size $n$, 
+    \begin{equation*}
+        \left|\Pr_{x \backsim U_n}[C(x)] - \Pr_{x \backsim U_s}[C(G(s))]\right| < \epsilon.
+    \end{equation*}
+\end{lemma}
+
+This lemma, which 
 
 \subsubsection{The Nisan-Wigderson Generator}
 
@@ -150,8 +163,6 @@ We will prove that, given a worst case hard function $f$, we can transform it in
 \end{center}
 
 \subsection{Worst Case Hardness to Mild Hardness}
-
-\newpage
 
 \begin{theorem}{3.x}
     Suppose that $\cC$ is a $[m^2, m]_2$ code with the following properties:
@@ -246,9 +257,7 @@ Fixing $k = \log |\F|$, we will write $\Had$ for the Hadamard code with paramete
 \begin{proof}
     Let's begin by verifying the parameters of the code. The dimension will still by $n$. To compute the block length, see that every symbol of a codeword $c \in \RM$ is encoded to a Hadamard codeword of length $2^{\log |\F|} = |\F| = \log^3 n$, so that the total length of the resulting word is $n^3 \log^3 n$. Thus, $\cC$ is indeed a $[n^3 \log^3 n, n]_2$ code.
 
-    Next, we claim that $\cC$ can be locally decoded in time $\polylog(n)$ up to a distance of $\sfrac{1}{28}$. Suppose that $c \in \cC$ and $\tilde{c}$ is a corrupted codeword such that $\delta(c, \tilde{c}) \leq \sfrac{1}{28}$. The algorithm for locally recovering $c$ from $\tilde{c}$ runs as follows. Run the local decoder $\LDec_\RM$ on the Reed-Muller code word represented by $\tilde{c}$, replacing each query to this code word with a call to the local decoder $\LDec_\Had$ with query access to $\tilde{c}$.
-
-    To see why this is a good idea, consider that since $\delta(c, \tilde{c}) \leq \sfrac{1}{28}$, there can be at most a $\sfrac{1}{7}$ blocks of Hadamard codewords which are corrupted beyond a distance of $\sfrac{1}{4}$. Thus the local decoder $\LDec_\Had$ with be able to decode a $1 - \sfrac{1}{7}$ fraction of these blocks. Therefore, the codeword which $\LDec_\RM$ queries will have distance at most $\sfrac{1}{7}$ from the polynomial represented by $c$, and thus it will locally decode $c$ with high probability.
+    Next, we claim that $\cC$ can be locally decoded in time $\polylog(n)$ up to a distance of $\sfrac{1}{28}$. Suppose that $c \in \cC$ and $\tilde{c}$ is a corrupted codeword such that $\delta(c, \tilde{c}) \leq \sfrac{1}{28}$. The algorithm for locally recovering $c$ from $\tilde{c}$ runs as follows. Run the local decoder $\LDec_\RM$ on the Reed-Muller code word represented by $\tilde{c}$, replacing each query to this code word with a call to the local decoder $\LDec_\Had$ with query access to $\tilde{c}$. The proof that this correctly locally decodes up to the required distance is similar to the proof of decoding concatenated codes we saw in class.
     
     Note that this will still run in time poly-logarithmic in $n$. Furthermore, we can boost the success probability of each decoder by repetition by sacrificing only a small increase in run time, and thus the process above can be made to succeed with probability $\sfrac{2}{3}$. Thus, $\cC$ can be locally decoded in $\polylog(n)$ time.
 \end{proof}

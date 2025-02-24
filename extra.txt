@@ -120,3 +120,9 @@ Worst to mild hardness alg
             \item Return $\LDec^{\TT(C)}(i)$ using $C$ to simulate queries to $\TT(C)$.
         \end{enumerate}
     }
+
+
+
+proof that the code can be locally decoded
+
+To see why this is a good idea, consider that since $\delta(c, \tilde{c}) \leq \sfrac{1}{28}$, there can be at most a $\sfrac{1}{7}$ blocks of Hadamard codewords which are corrupted beyond a distance of $\sfrac{1}{4}$. Thus the local decoder $\LDec_\Had$ with be able to decode a $1 - \sfrac{1}{7}$ fraction of these blocks. Therefore, the codeword which $\LDec_\RM$ queries will have distance at most $\sfrac{1}{7}$ from the polynomial represented by $c$, and thus it will locally decode $c$ with high probability.
