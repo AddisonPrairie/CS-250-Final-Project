@@ -198,7 +198,7 @@ Theorem 3.x reduces the task of hardness amplification to finding a suitable err
 \begin{definition}{3.x}[Reed-Muller Codes]
     Suppose $\F$ is a finite field of size $q$. The Reed-Muller code $\RM_q(m, d)$ is the set of all evaluations of $d$-degree $m$-variate polynomials over $\F_q$,
     \begin{equation*}
-        \RM_q(m ,r) = \left\{(f(\gamma_1), f(\gamma_2), \ldots, f(\gamma_{q^m})) : f \in \F_q[X_1, \ldots, X_m], \, \deg (f) \leq d\right\},
+        \RM_q(m ,d) = \left\{(f(\gamma_1), f(\gamma_2), \ldots, f(\gamma_{q^m})) : f \in \F_q[X_1, \ldots, X_m], \, \deg (f) \leq d\right\},
     \end{equation*}
     where $\gamma_1, \ldots, \gamma_{q^m}$ is a canonical ordering of $\F_q^m$. This code has dimension $k = \binom{m + d}{d}$, block length $q^m$, and relative distance $\delta = 1 - d/ q$.
 \end{definition}
@@ -240,48 +240,71 @@ In class, we saw the following guarantees for locally correcting the Hadamard co
 Fixing $k = \log |\F|$, we will write $\Had$ for the Hadamard code with parameter $k$. Let's suppose for a second that we could transform each of our local correcting algorithms to local decoding algorithms. Then we claim that the concatenated code $\cC = \Had \concat \RM$ will satisfy the requirements of Theorem 3.x.
 
 \begin{claim}{3.x}
-    The code $\cC$ is a $[n^4, n, \sfrac{1}{28}]_2$ code which can be locally decoded in $\polylog(n)$ time.
+    The code $\cC$ is a $[n^3\log^3 n, n]_2$ code which can be locally decoded up to a relative distance of $\sfrac{1}{28}$ in $\polylog(n)$ time.
 \end{claim}
 
 \begin{proof}
-    Let's begin by verifying the parameters of the code. The dimension will still by $n$, and the distance will be the product of the distances, so that $\delta = \sfrac{1}{28}$. To compute the block length, see that every symbol of a codeword $c \in \RM$ is encoded to a Hadamard codeword of length $2^{\log |\F|} = |\F| = \log^3 n$, so that the total length of the resulting word is $n^3 \cdot \log^3 n \leq n^4$. Thus, $\cC$ is indeed a $[n^4, n, \sfrac{1}{28}]_2$ code.
+    Let's begin by verifying the parameters of the code. The dimension will still by $n$. To compute the block length, see that every symbol of a codeword $c \in \RM$ is encoded to a Hadamard codeword of length $2^{\log |\F|} = |\F| = \log^3 n$, so that the total length of the resulting word is $n^3 \log^3 n$. Thus, $\cC$ is indeed a $[n^3 \log^3 n, n]_2$ code.
 
-    Next, we claim that $\cC$ can be locally decoded in time $\polylog(n)$. Suppose that $c \in \cC$ and $\tilde{c}$ is a corrupted codeword such that $\delta(c, \tilde{c}) \leq \sfrac{1}{28}$. The algorithm for locally recovering $c$ from $\tilde{c}$ runs as follows. Run the local decoder $\LDec_\RM$ on the Reed-Muller code word represented by $\tilde{c}$, replacing each query to this code word with a call to the local decoder $\LDec_\Had$ with query access to $\tilde{c}$.
+    Next, we claim that $\cC$ can be locally decoded in time $\polylog(n)$ up to a distance of $\sfrac{1}{28}$. Suppose that $c \in \cC$ and $\tilde{c}$ is a corrupted codeword such that $\delta(c, \tilde{c}) \leq \sfrac{1}{28}$. The algorithm for locally recovering $c$ from $\tilde{c}$ runs as follows. Run the local decoder $\LDec_\RM$ on the Reed-Muller code word represented by $\tilde{c}$, replacing each query to this code word with a call to the local decoder $\LDec_\Had$ with query access to $\tilde{c}$.
 
     To see why this is a good idea, consider that since $\delta(c, \tilde{c}) \leq \sfrac{1}{28}$, there can be at most a $\sfrac{1}{7}$ blocks of Hadamard codewords which are corrupted beyond a distance of $\sfrac{1}{4}$. Thus the local decoder $\LDec_\Had$ with be able to decode a $1 - \sfrac{1}{7}$ fraction of these blocks. Therefore, the codeword which $\LDec_\RM$ queries will have distance at most $\sfrac{1}{7}$ from the polynomial represented by $c$, and thus it will locally decode $c$ with high probability.
     
     Note that this will still run in time poly-logarithmic in $n$. Furthermore, we can boost the success probability of each decoder by repetition by sacrificing only a small increase in run time, and thus the process above can be made to succeed with probability $\sfrac{2}{3}$. Thus, $\cC$ can be locally decoded in $\polylog(n)$ time.
 \end{proof}
 
-We've established that this code has the parameters we need, but we've intentionally been a bit vague on what encoding scheme we will use for our Reed-Muller and Hadamard codes. The reason for this is that, while we've seen that both of these codes are locally \emph{correctable} codes, for Theorem ?? to work, we require locally \emph{decodable} codes. In the case of the Hadamard code, we can recover an algorithm for local decoding from our algorithm for local correcting.
+So, given two local decoding algorithms for $\Had$ and $\RM$, we can construct our desired code. To convert our local correctors to local decoders, recall the notion of systematic encodings.
 
-\begin{claim}{3.x}
-    The Hadamard code has a local decoder making $2$ queries.
-\end{claim}
+\begin{definition}{3.x}
+    A $[\ell, n]_2$  code with encoder $\Enc : \pmo^{n} \rightarrow \pmo^{\ell}$ is systematic if for every bit $i_{in} \in [n]$, there exists a bit $i_{out} \in [\ell]$ such that for any message $w \in \pmon$, 
+    \begin{equation*}
+        (\Enc(w))_{i_{out}} = w_{i_{in}}.
+    \end{equation*}
+\end{definition}
 
-The reason this works is that the Hadamard code is \emph{systematic}: for every index $i \in [k]$ of a bit in a message, there exists an index $j \in [2^k]$ of a bit in the encoded codeword which is equal to the $i$-th bit in the message. To get a local decoding algorithm for Reed-Muller codes, we need to come up with a way to systematically encode them efficiently. This will be addressed in the next section. For now, lets assume that we have local decoders for both codes. Then we claim we have a local decoder for the concatenated code $\cC$:
-
-\begin{claim}{3.x}
-    The code $\cC$ is a $[n^4, n, \sfrac{1}{14}]_2$ code computable in $\poly(n)$ time with a local decoder running in $\polylog(n)$ time.
-\end{claim}
+In other words, a systematic encoding of a code allows one to obtain any bit in the original message by reading a particular bit of the codeword. Thus, if a code is both locally correctable and systematically encodable, then we can systematically decode it, since to recover a particular index of the message, we just need to locally correct the corresponding index in the corrupted code word. Thus, we just need to find systematic encodings for both $\Had$ and $\RM$.
 
 \subsubsection{Systematic Encodings and Low Degree Extensions}
 
-Consider that any string $x \in \pmon$ can be viewed as the truth table of a function $f_x : \pmo^{\log n} \rightarrow \pmo$. We want to transform this into into a code word $\hat{f}_x$ in our Reed-Muller code. In this case, the requirements on $\hat{f}_x$ are:
-\begin{enumerate}
-    \item $\deg(\hat{f}_x) \leq \log^2 n$.
-    \item $\hat{f}_x$ is a polynomial over $m$ variables, where we recall $m = \log n / \log \log n$.
-\end{enumerate}
-
-Choose a subset $\bH \subseteq \F$ of size $\log \log n$. We will view a string $x \in \pmon$ as the truth table of a function $f : \bH^{m} \rightarrow \pmo$. Since the total size of $\bH$ is $\log \log n$ this is valid. Next, we can extend this to a polynomial $\hat{f}_x : \F^m \rightarrow \F$ as the following:
+First, we claim that the standard encoder for the Hadamard code is systematic. Recall that given a string $w \in \zo^k$, the encoder $\Enc_\Had : \zo^k \rightarrow \zo^{2^k}$ just outputs the truth table of the function $x \mapsto \langle x, w \rangle$,
 \begin{equation*}
-    \hat{f}_x(y_1, \ldots, y_m) = \sum_{\alpha \in \bH^m}f(\alpha) \cdot \delta_\alpha(y_1, \ldots, y_m),
-\end{equation*} 
-where the polynomial $\delta_\alpha : \F^m \rightarrow \F$ is defined as 
-\begin{equation*}
-    \delta_\alpha(y_1, \ldots, y_m) = \prod_{i \in [m]} \prod_{\gamma \neq \alpha_i} (y_i - \gamma). 
+    \Enc_\Had (w) = \TT\left(x \mapsto \langle x, w \rangle\right).
 \end{equation*}
-Note that the degree of this polynomial is 
+In particular, in the index corresponding to $x = e_i$, the value of $\Enc_\Had(w)$ is just $\langle w, e_i \rangle = w_i$. Thus, this encoding is systematic, and we obtain a local decoder for $\Had$.
+
+\begin{claim}{3.x}
+    The Hadamard code $\Had$ can be efficiently, systematically encoded, and locally decoded up to a relative distance of $\delta \leq \sfrac{1}{4}$ with $2$ queries.
+\end{claim}
+
+However, we have to be a bit more careful with the Reed-Muller code. The encoder we saw in class views the message as coefficients of a low degree polynomial, while the encoded word is the value of that polynomial on every input. To systematically encode the Reed-Muller code, we will need to view the message as a subset of these evaluation points, and transform these into a polynomial which takes the same values on these points. Before specifying exactly what we mean by this, let's recall our setup from the section above: our code $\RM$ was a Reed-Muller code $\RM_q(m, d)$, where $q = \log^3 n$, $m = \log n / \log \log n$, and $d = \log^2 n$. This code had dimension at least $n$, so that we can encode any $w \in \zo^n$ to a codeword $c \in \RM_q(m, d)$. To following claim gives a way to systematically encode $\RM$.
+
+\begin{claim}{3.x}
+    Our Reed-Muller code $\RM$ can be efficiently systematically encoded.
+\end{claim}
+
+\begin{proof}
+    Fix a subset $\bH \subseteq \F_q$ of size $|\bH| = \log n$. The proof works as follows: first, we show that any $w \in \zo^n$ can be viewed as the truth table of a function $f_w : \bH^m \rightarrow \zo$. Next, we show that any such $f : \bH^m \rightarrow \zo$ can be extended to a codeword $\hat{f}_w : \F_q^m \rightarrow \F_q$ in $\RM$ which agrees with $f$ on the subset $\bH^m$. Once we prove both of these steps, the encoding which maps $w \in \zo^n$ to the evaluation of $\hat{f}_w$ will be systematic. Fix some $w \in \zo^n$. See that the set $\bH^m$ has size 
+    \begin{equation*}
+        |\bH^m| = \left(\log n\right)^{\log n / \log \log n} = n.
+    \end{equation*}
+    Thus, any $w \in \zo^n$ represents the truth table of a $f_w : \bH^m \rightarrow \zo$, and vice versa. Next, suppose we have some $f_w : \bH^m \rightarrow \zo$. Consider the polynomial $\hat{f}_w : \F_q^m \rightarrow \F_q$ defined by 
+    \begin{equation*}
+        \hat{f}_w(X_1, \ldots, X_m) = \sum_{\alpha \in \bH^m} f_w(\alpha) \cdot \frac{\delta_\alpha \left(X_1, \ldots, X_m\right)}{\delta_\alpha(\alpha)},
+    \end{equation*}
+    where we define 
+    \begin{equation*}
+        \delta_\alpha \left(X_1, \ldots, X_m\right) = \prod_{i \in [m]} \prod_{\gamma \in \bH \setminus \{\alpha_i\}} (X_i - \gamma). \tag{1}
+    \end{equation*}
+    We claim that $\hat{f}_w |_{\bH^m} = f_w$. First, note that for any $\alpha, \beta \in \bH^m$, $\delta_{\alpha}(\beta) = 0$ unless $\alpha = \beta$. To see why, consider that if $\alpha \neq \beta$, then there exists a particular index $j \in [m]$ where $\alpha$ and $\beta$ differ, so that $\beta_j \notin \bH \setminus \{\alpha_j\}$. Then the product in equation (1) contains a $(\beta_j - \beta_j)$ term, and thus is equal to $0$. With this observation, we see that for any $\beta \in \bH^m$, 
+    \begin{equation*}
+        \hat{f}_w \left(\beta\right) = \sum_{\alpha \in \bH^m} f_w(\alpha) \frac{\delta_\alpha(\beta)}{\delta_{\alpha}(\alpha)} = f_w(\beta) \frac{\delta_\beta(\beta)}{\delta_\beta(\beta)} = f_w(\beta).
+    \end{equation*}
+    Thus, $\hat{f}_w$ does extend $f_w$ on $\bH^m$. To complete the proof, we have to verify that $\hat{f}_w$ is a codeword in $\RM$. To do so, we just need to verify that $\deg(\hat{f}_w) \leq d = \log^2 n$. By construction, the degree of $\hat{f}_w$ is at most the degree of any $\delta_\alpha(X_1, \ldots, X_m)$. Since each $\delta_\alpha$ is the product of $m \cdot (|\bH| - 1)$ monomials, the degree of $\hat{f}_w$ is,
+    \begin{equation*}
+        \deg \left(\hat{f}_w\right) \leq m \cdot (|\bH| - 1) \leq \frac{\log n}{\log \log n} \cdot \left(\log n - 1\right) \leq \log^2 n = d.
+    \end{equation*}
+    Thus, our encoding will map $w \in \zo^n$ to codewords $\hat{f}_w \in \RM$ systematically. Note also that this encoding is still efficient, since the polynomial $\hat{f}_w$ can be evaluated in at any $\beta \in \F_q^m$ in $\poly(m, q, d)$ time.
+\end{proof}
 
 \subsection{Worst Case Hardness to Average Case Hardness}
 
