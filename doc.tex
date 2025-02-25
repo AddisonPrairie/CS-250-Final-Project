@@ -53,7 +53,7 @@ We will prove that, given a worst case hard function $f$, we can transform it in
 \begin{definition}{3.x}
     We say that a function $G : \pmo^\ell \rightarrow \pmo^{n}$ is an $(\ell, n)$-PRG if, for any size $n$ circuit $C$ over $n$ inputs, 
     \begin{equation*}
-        \left|\Pr_{x \backsim U_n}[C(x)] - \Pr_{x \backsim U_s}[C(G(s))]\right| < \frac{1}{10}.
+        \left|\Pr_{x \backsim U_n}[C(x)] - \Pr_{s \backsim U_\ell}[C(G(s))]\right| < \frac{1}{10}.
     \end{equation*}
 \end{definition}
 
@@ -62,31 +62,57 @@ We will prove that, given a worst case hard function $f$, we can transform it in
 
 \subsubsection{A Simple PRG}
 
+As a warmup, we will use the average case hardness assumption to construct a PRG which increases the size of the pseudorandom string by one bit. While this result itself is not useful for any derandomization, the ideas used will be helpful in analyzing our stronger PRG.
+
 \begin{theorem}{3.x}
     Given the average case hardness assumption, there exists a $(n - 1, n)$-PRG.
 \end{theorem}
-
-To prove this . Intuitively, it says that if no small circuit can predict the $i$-th bit of our PRG given the first $i - 1$ bits, then no small circuit can distinguish $G$ from truly random bits. This will reduce the task of analyzing a circuit fed our entire PRG output to analyzing a circuit on just one bit.
-
+\noindent
+Have $f : \pmo^{n - 1} \rightarrow \pmo$ be an average case hard function. Our $(n - 1, n)$-PRG $G$ will be defined as follows:
+\begin{equation*}
+    G(s_1, \ldots, s_{n - 1}) = \bigl(s_1, \ldots, s_{n - 1}, f(s_1, \ldots, s_{n - 1})\bigr).
+\end{equation*}
+In this case, the first $n - 1$ bits are truly random, and so no circuit will be able to distinguish them from uniform random bits. For the last bit, since any small circuit can't do much better than guessing the value of $f$, this bit will also appear essentially random. To formalize this, we will use Yao's next bit prediction lemma. Intuitively, it reduces the task of analyzing a circuit's behavior on an entire psuedorandom string to analyzing it's ability to predict a particular bit given the previous bits.
 \begin{lemma}{3.x}[Yao's Next Bit Prediction Lemma]
     Write $G(s) = (z_1, \ldots, z_n)$. Suppose that for all $i \in [n]$, any circuit $C : \pmo^{i - 1} \rightarrow \pmo$ of size $n$ has 
     \begin{equation*}
-        \Corr\left(C(z_1, \ldots, z_{i - 1}), z_i\right) < \frac{\epsilon}{n}.
+        \Corr\left(C(z_1, \ldots, z_{i - 1}), z_i\right) < \frac{\epsilon}{n}. \tag{1}
     \end{equation*}
     Then for any $C : \pmo^n \rightarrow \pmo$ of size $n$, 
     \begin{equation*}
-        \left|\Pr_{x \backsim U_n}[C(x)] - \Pr_{x \backsim U_s}[C(G(s))]\right| < \epsilon.
+        \left|\Pr_{x \backsim U_n}[C(x)] - \Pr_{s \backsim U_\ell}[C(G(s))]\right| < \epsilon. \tag{2}
     \end{equation*}
 \end{lemma}
+Note that fixing $\epsilon = \sfrac{1}{10}$, the condition in equation (2) says that $G$ is a $(n - 1, n)$-PRG. Thus, to prove that Theorem 3.x, we just need to show that $G$ satisfies the hypothesis of Lemma 3. x: the $i$-th bit should be unpredictable given the first $(i - 1)$ bits.
 
-This lemma, which 
+\begin{proof}[Proof \textup{(Of Theorem 3.x)}.]
+    By Lemma 3.x, it suffices to show that for any $i \in [n]$ and circuit $C$ of size $n$, 
+    \begin{equation*}
+        \Corr(C(z_1, \ldots, z_{i - 1}), z_i) < \frac{1}{10 n}. \tag{3}
+    \end{equation*}
+    First, see that for $i \in [n - 1]$, the bit $z_i$ is independent of the first $i - 1$ bits. Thus, $z_i$ is independent of the output of $C$, and so the correlation must be equal to $0$. When $i = n$, we can expand the expression with our definition of $G$,
+    \begin{equation*}
+        \Corr(C(z_1, \ldots, z_{n - 1}), z_n) = \Corr(C(z_1, \ldots, z_{n - 1}), f(z_1, \ldots, z_{n - 1})) = \Corr(C, f).
+    \end{equation*}
+    Now, since $C$ is a size $n$ circuit, while $f$ is average case hard against size $2^{\delta (n - 1)} = O(2^{\delta n})$ size circuits,
+    \begin{equation*}
+        \Corr(C, f) \leq 2^{-\Omega(n - 1)} < \frac{1}{10 n}.
+    \end{equation*}
+    Thus, equation (3) holds for all $i \in [n]$, and so $G$ is a $(n - 1, n)$-PRG.
+\end{proof}
 
 \subsubsection{The Nisan-Wigderson Generator}
 
+Now, we wish to use a similar strategy to construct an $(c \log n, n)$-PRG for some constant $c > 1$ which we will choose later. 
 \begin{theorem}{3.x}
     Given the average case hardness assumption, there exists a $(O(\log n), n)$-PRG.
 \end{theorem}
-
+\noindent
+Have $f$ be an average case hard function such that $\Corr(f, 2^{\delta n}) < 2^{-\delta n}$. Suppose that $\cS$ is a collection of $n$ subsets $S_1, \ldots, S_n \subseteq [c \log n]$, each of size $\sfrac{2}{\delta} \cdot \log n$. We can construct a generator $G_\cS$ as follows: on input $s \in \pmo^{c \cdot \log n}$, the $i$-th output of $G_\cS$ will correspond to the evaluation of $f$ on the subset of bits $S_i$,
+\begin{equation*}
+    (G_\cS(s))_{i} = f(s_{j_1}, \ldots, s_{j_{\sfrac{2}{\delta} \cdot \log n}}), \quad \left\{j_1, \ldots, j_{\sfrac{2}{\delta} \cdot \log n}\right\} = S_i.
+\end{equation*}
+Pictorally, the function $G_\cS$ looks something like this.
 \begin{center}
     \begin{tikzpicture}[align=center,node distance=4cm, scale=1.5]
         \node[circle, inner sep=0pt, minimum size=15pt] (1) at (1, 0) {$s_1$}; 
@@ -155,12 +181,28 @@ This lemma, which
         \draw[->] (16) -- (26);
 
         \draw [decorate,decoration={brace,amplitude=5pt}]
-  (0.25,3.75) -- (6.75,3.75) node[midway, yshift=.5cm]{$G(s)$};
+  (0.25,3.75) -- (6.75,3.75) node[midway, yshift=.5cm]{$G_\cS(s) \in \pmo^{n}$};
 
         \draw[decorate, decoration={brace,amplitude=5pt, mirror}] 
-        (.75, -.2) -- (6.25, -.2) node[midway, yshift=-.5cm]{$s$};
+        (.75, -.2) -- (6.25, -.2) node[midway, yshift=-.5cm]{$s \in \pmo^{\ell}$};
     \end{tikzpicture}
 \end{center}
+\noindent
+The reason why we chose $\sfrac{2}{\delta} \cdot \log n$ for the size of each subset is that this will make any individual bit of $G$'s output hard for size $n$ circuits, even if we give them $s$, since
+\begin{equation*}
+    n < n^2 = 2^{\sfrac{2}{\delta} \cdot \delta \cdot \log n}.
+\end{equation*}
+However, this is not quite enough to apply Yao's next bit prediction lemma, since the $i$-th bit must be unpredictable given all the previous bits. In particular, if there existed distinct $i, j \in [n]$ such that $S_i = S_j$, then a circuit could easily predict the $i$-th bit of $G$ given the $j$-th bit, and vice versa, so that applying Lemma 3.x will fail. It turns out that to get around this, it suffices to have the intersection $S_i \cap S_j$ to contain at most $\log n$ elements. We can summarize our requirements in the following definition:
+
+\begin{definition}{3.x}
+    We call a collection $\cS$ of subsets $S_1, \ldots, S_n \subseteq [c \log n]$ an $[n, \ell, d]_{c \log n}$ combinatorial design if
+    \begin{enumerate}
+        \item Each $S_i$ has size $\ell$, 
+        \item For distinct $i \neq j$, the intersection $|S_i \cap S_j| \leq d$.
+    \end{enumerate}
+\end{definition}
+
+Thus, we 
 
 \subsection{Worst Case Hardness to Mild Hardness}
 
