@@ -50,19 +50,67 @@ We will prove that, given a worst case hard function $f$, we can transform it in
 
 \subsection{Why Hardness Amplification?}
 
+While hardness amplification in other fields such as cryptography, we will use it to construct \emph{pseudorandom generators}, a special type of function which, given a small number of truly random bits, output a large number of psuedorandom bits which nonetheless indistinguishable from an equivalent number of truly random bits to computationally bounded algorithms. While such functions have been designed for a variety of computational models, we will be interested in the most general of these models: Turing machines and circuits.
+
 \begin{definition}{3.x}
     We say that a function $G : \pmo^\ell \rightarrow \pmo^{n}$ is an $(\ell, n)$-PRG if, for any size $n$ circuit $C$ over $n$ inputs, 
     \begin{equation*}
         \left|\Pr_{x \backsim U_n}[C(x)] - \Pr_{s \backsim U_\ell}[C(G(s))]\right| < \frac{1}{10}.
     \end{equation*}
+    We will call $\ell$ the \emph{seed length} of $G$.
 \end{definition}
+
+The definition above says that, up to a small (i.e., $\sfrac{1}{10})$ difference, the generator $G$ ``fools'' any circuit $C$ into believing the inputs we've given it are truly random. Why would we be interested in such a function? The theorem below demonstrates that, given a PRG which has a relatively small seed length and is efficiently computable, any problem solvable in \emph{randomized} polynomial time is also solvable in \emph{deterministic} polynomial time.
 
 \begin{theorem}{3.x} Suppose that $G$ is a $(O(\log n), n)$-PRG computable in $\poly(n)$ time. Then $\P = \BPP$.
 \end{theorem}
 
+Given that the $\P$ versus $\BPP$ problem remains unsolved, it should be clear that we don't know whether such PRGs exist. However, in xxx, xxx proved that, given an average case hard function $f$, one can construct a PRG matching the requirements in Theorem 3.x.
+
+\begin{theorem}{3.x}
+    Given the average case hardness assumption, there exists a $(O(\log n), n)$-PRG.
+\end{theorem}
+
+Thus, the task of constructing such a PRG reduces to finding an average case hard function, and supposing we can amplify hardness as in Theorem 3.x, this is in fact equal to finding a worst case hard function. By combining theorems 3.x, 3.x, and 3.x, we have the following:
+
+\begin{corollary}{3.x}
+    If there exists some $\delta > 0$ such that SAT requires circuits of size $\Omega(2^{\delta n})$, then $\P = \BPP$.
+\end{corollary}
+
+This section of the paper is meant to outline the connection between hardness and randomness, demonstrating how we can convert assumptions about functions which are hard to efficient PRGs. As a warm up, we begin by proving theorem 3.x. We will need the following standard fact in complexity theory.
+
+\begin{fact}{3.x}
+    Suppose that there exists a polynomial time algorithm $A$ computing $f$. Then there exists a polynomial size circuit $C$ computing $f$.
+\end{fact}
+
+Thus, any PRG which can fool circuits can fool Turing machines as well; for reasons discussed later, it we will often find it easier to construct PRGs against circuits.
+
+\begin{proof}[Proof \textup{(of Theorem 3.x)}] Suppose that $f \in \BPP$, so that there exists a polynomial time algorithm $A$ probabilistically computing $f$ using $r = \poly(n)$ random bits. When computing $f$ on $x \in \pmon$, we will view $A$ as taking two inputs: the string $x$, and a string of random bits $u \in \pmo^{r}$. The fact that $A$ probabilistically computes $f$ means that for every $x \in \pmon$, 
+\begin{equation*}
+    \Pr_{u \backsim U_r}[A(x, u) = f(x)] \geq \sfrac{2}{3}. 
+\end{equation*}
+Using fact 3.x, we can convert this to a $\poly(n)$ sized circuit $C$ computing the same function. For any $x \in \pmon$, we will write $C^x$ to denote the circuit which fixes the first $n$ inputs of $C$ to that particular string.
+\begin{equation*}
+    \Pr_{u \backsim U_r}[C^{x}(u) = f(x)] \geq \sfrac{2}{3}. 
+\end{equation*}
+Write $m = |C|$, suppose that $G$ is an $(O(\log m), m)$-PRG computable in $\poly(m)$ time. Then 
+\begin{equation*}
+    \Pr_{s \backsim U_{O(\log n)}}[C^{x}(G(s)) = f(x)] \geq \sfrac{2}{3} - \sfrac{1}{10} \geq .55.
+\end{equation*}
+Since $C$ and $A$ compute the same function, 
+\begin{equation*}
+    \Pr_{s \backsim U_{O(\log n)}}[A(x, s) = f(x)] \geq  .55. \tag{1}
+\end{equation*}
+Now consider the following deterministic polynomial time algorithm $A'$ for computing $f$: on input $x \in \pmon$, iterate over all seed $s \in \pmo^{O(\log n)}$, computing $A(x, s)$; then, output whichever bit appears more among these computations. $A'$ requires running $G$ and $A$ for every string in $\pmo^{O(\log m)}$. Since $m = \poly(n)$, the total running time of $A'$ is 
+\begin{equation*}
+    \left|\pmo^{O(\log n)}\right| \cdot \poly(m) \cdot \poly(n) = 2^{O(\log n)} \cdot \poly(n) = \poly(n).
+\end{equation*}
+Moreover, by the guarantee of equation (1), the bit which appears more often among these computations will be the value of $f$. Thus, $A'$ is a deterministic polynomial time algorithm computing $f$, so that $f \in \P$.
+\end{proof}
+
 \subsubsection{A Simple PRG}
 
-As a warmup, we will use the average case hardness assumption to construct a PRG which increases the size of the pseudorandom string by one bit. While this result itself is not useful for any derandomization, the ideas used will be helpful in analyzing our stronger PRG.
+To see the key ideas used in constructing a PRG capable of derandomizing BPP, we will use the average case hardness assumption to construct a PRG which increases the size of the pseudorandom string by one bit.
 
 \begin{theorem}{3.x}
     Given the average case hardness assumption, there exists a $(n - 1, n)$-PRG.
@@ -103,12 +151,12 @@ Note that fixing $\epsilon = \sfrac{1}{10}$, the condition in equation (2) says 
 
 \subsubsection{The Nisan-Wigderson Generator}
 
-Now, we wish to use a similar strategy to construct an $(c \log n, n)$-PRG for some constant $c > 1$ which we will choose later. 
+Extending the analysis above, Nisan and Wigderson were able to use the average case hardness assumption to construct a pseudorandom generator which stretches the seed bits exponentially further. While we won't give the of this fact in this section, we will describe their construction; the analysis that such a construction is in fact a good PRG is similar to that in section 3.1.1.
 \begin{theorem}{3.x}
     Given the average case hardness assumption, there exists a $(O(\log n), n)$-PRG.
 \end{theorem}
 \noindent
-Have $f$ be an average case hard function such that $\Corr(f, 2^{\delta n}) < 2^{-\delta n}$. Suppose that $\cS$ is a collection of $n$ subsets $S_1, \ldots, S_n \subseteq [c \log n]$, each of size $\sfrac{2}{\delta} \cdot \log n$. We can construct a generator $G_\cS$ as follows: on input $s \in \pmo^{c \cdot \log n}$, the $i$-th output of $G_\cS$ will correspond to the evaluation of $f$ on the subset of bits $S_i$,
+The generator works by having \emph{every} bit of the output compute the hardcore function on some roughly disjoint subset of the bits of the seed $s \in \pmo^{O(\log n)}$. Fix some constant $c > 1$ which we are free to choose later, and have $f$ be an average case hard function such that $\Corr(f, 2^{\delta n}) < 2^{-\delta n}$. Suppose that $\cS$ is a collection of $n$ subsets $S_1, \ldots, S_n \subseteq [c \log n]$, each of size $\sfrac{2}{\delta} \cdot \log n$. We can construct a generator $G_\cS$ as follows: on input $s \in \pmo^{c \cdot \log n}$, the $i$-th output of $G_\cS$ will correspond to the evaluation of $f$ on the subset of bits $S_i$,
 \begin{equation*}
     (G_\cS(s))_{i} = f(s_{j_1}, \ldots, s_{j_{\sfrac{2}{\delta} \cdot \log n}}), \quad \left\{j_1, \ldots, j_{\sfrac{2}{\delta} \cdot \log n}\right\} = S_i.
 \end{equation*}
@@ -188,21 +236,21 @@ Pictorally, the function $G_\cS$ looks something like this.
     \end{tikzpicture}
 \end{center}
 \noindent
-The reason why we chose $\sfrac{2}{\delta} \cdot \log n$ for the size of each subset is that this will make any individual bit of $G$'s output hard for size $n$ circuits, even if we give them $s$, since
-\begin{equation*}
-    n < n^2 = 2^{\sfrac{2}{\delta} \cdot \delta \cdot \log n}.
-\end{equation*}
-However, this is not quite enough to apply Yao's next bit prediction lemma, since the $i$-th bit must be unpredictable given all the previous bits. In particular, if there existed distinct $i, j \in [n]$ such that $S_i = S_j$, then a circuit could easily predict the $i$-th bit of $G$ given the $j$-th bit, and vice versa, so that applying Lemma 3.x will fail. It turns out that to get around this, it suffices to have the intersection $S_i \cap S_j$ to contain at most $\log n$ elements. We can summarize our requirements in the following definition:
+The most important factor in our choice of $\cS$ is what we mean by each subset being ``roughly disjoint.'' If we wanted to make them truly disjoint, we'd need at least our seed length to be atleast $\sfrac{2}{\delta} \cdot n \cdot \log n$, which defeats the purpose of a PRG; thus, we'll need to compromise by allowing some overlap between different $S_i$ and $S_j$. However, we cannot have two of these subsets overlap too much: as an extreme example, if $S_i = S_j$ for some $i < j$, then the $i$ and $j$-th bits of $G$ will be perfectly correlated, preventing us from using Yao's Next Bit Prediction Lemma in our analysis.
 
-\begin{definition}{3.x}
-    We call a collection $\cS$ of subsets $S_1, \ldots, S_n \subseteq [c \log n]$ an $[n, \ell, d]_{c \log n}$ combinatorial design if
-    \begin{enumerate}
-        \item Each $S_i$ has size $\ell$, 
-        \item For distinct $i \neq j$, the intersection $|S_i \cap S_j| \leq d$.
-    \end{enumerate}
-\end{definition}
+Thus, the key question is how we can balance between these two extremes: we need some overlap so that the seed length is small, but not too much that different bits in the output are too correlated. As it turns out, we can ensure that no two bits $i$ and $j$ will be too correlated so long as $|S_i \cap S_j| < \log n$; thus, we can construct a good PRG so long as $\cS$ satisfies the following properties:
+\begin{enumerate}
+    \item $\cS$ contains $n$ subsets $S_1, S_2, \ldots, S_n \subseteq [c \log n]$,
+    \item every subset $S_i$ has size $|S_i| = \sfrac{2}{\delta} \cdot \log n$,
+    \item for distinct $i \neq j$, $|S_i \cap S_j| \leq \log n$.
+\end{enumerate}
+It is not obvious that such a collection exists:  can we even find an exponential (in $\log n$) number of subsets of $O(\log n)$ bits, each of size $O(\log n)$, which have overlap at most $\log n$? As it turns out, objects satisfying these properties have a name: a collection $\cS$ satisfying properties 1-3 is called a $(c \log n, \sfrac{2}{3} \cdot \log n, \log n, n)$-\emph{combinatorial design}. Moreover, for a large enough constant $c > 1$, such combinatorial designs exist:
 
-Thus, we 
+\begin{claim}{3.x}
+    There exists a constant $c > 1$ such that a $(c \log n, \sfrac{2}{3} \cdot \log n, \log n, n)$-combinatorial design exists and can be produced in $\poly(n)$ time.
+\end{claim}
+
+While we will not go through the analysis here, one can prove Claim 3.x with the natural greedy algorithm: start with an empty collection $\cS$ and iterate through all subsets of size $\sfrac{2}{\delta} \cdot \log n$, adding any subset to $\cS$ which does not overlap too much with the subsets already added to $\cS$. Thus, we can find a good combinatorial design $\cS$ and, although we haven't proved it here, this can be used to construct $G_\cS$, a good $(O(\log n), n)$-PRG. Thus, we can construct good PRGs from average case hard functions, allowing us to use such an assumption to derandomize BPP.
 
 \subsection{Worst Case Hardness to Mild Hardness}
 
