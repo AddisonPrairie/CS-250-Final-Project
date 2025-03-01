@@ -74,7 +74,7 @@ Given that the $\P$ versus $\BPP$ problem remains unsolved, it should be clear t
 Thus, the task of constructing such a PRG reduces to finding an average case hard function, and supposing we can amplify hardness as in Theorem 3.x, this is in fact equal to finding a worst case hard function. By combining theorems 3.x, 3.x, and 3.x, we have the following:
 
 \begin{corollary}{3.x}
-    If there exists some $\delta > 0$ such that SAT requires circuits of size $\Omega(2^{\delta n})$, then $\P = \BPP$.
+    If there exists some $\delta > 0$ such that \SAT{} requires circuits of size $\Omega(2^{\delta n})$, then $\P = \BPP$.
 \end{corollary}
 
 This section of the paper is meant to outline the connection between hardness and randomness, demonstrating how we can convert assumptions about functions which are hard to efficient PRGs. As a warm up, we begin by proving theorem 3.x. We will need the following standard fact in complexity theory.
@@ -416,24 +416,16 @@ Note that in our analysis in Theorem 3.?, we could amplify the hardness of the a
     \end{equation*}
 \end{definition}
 
-
-In general, we will call an algorithm which learns $\cF$ to accurracy $1 - \sfrac{1}{n}$ a \emph{strong learner}, and an algorithm which learns $\cF$ to accuracy $\sfrac{1}{n}$ a \emph{weak learner}.
-
+In this section, we will be interested in two types of learning: weak and strong learning. We say that an algorithm $\cA$ \emph{strongly learns} a class $\cF$ if is learns the class to an accuracy of $1 - \sfrac{1}{n}$, while we say that it \emph{weakly learns} a class $\cF$ if it learns the class to an accuracy of $\sfrac{1}{n}$. In other words, a strong learner outputs a circuit whose correlation with the target function becomes arbitrarily close to $1$, while a weak learner outputs a circuit which does only slightly better than random guessing.
 
 
 \subsection{Boosting With XOR}
-
-
-
-
 
 \begin{theorem}{4.x}[Boosting with XOR \cite{BonehLipton}]
     Suppose that $\cF$ is closed under \XOR{} and can be efficiently weakly learned. Then $\cF$ can be efficiently strongly learned.
 \end{theorem}
 
-Before jumping into the proof, let's see how such a boosting algorithm can be used. 
-
-The strategy for the proof can be summed up in the following remark.
+To get an idea of how the proof works, we make the following remark.
 
 \begin{remark}{4.x}
     Fix a small $\eps, \delta > 0$. Suppose that $c$ is a coin which is biased in an unknown direction: the probability it heads is either $\sfrac{1}{2} + \eps$ or $\sfrac{1}{2} - \eps$, but we're unsure which. If we want to determine the direction of the bias, how many flips do we need until we can guess correctly with probability $1 - \delta$? Applying the Chernoff bound, if we make $O\left(\frac{\log \left(\sfrac{1}{\delta}\right)}{\eps^2}\right)$ independent flips and take the more common value among the resulting flips, this will correctly tell us the direction of the bias with probability $1 - \delta$.
@@ -443,7 +435,7 @@ For the remainder of this section, fix an $f : \pmon \rightarrow \pmo$ which we 
 \begin{equation*}
     \Pr[\tilde{f}(x) = f(x)] > \frac{1}{2} + \frac{1}{n},
 \end{equation*}
-where this probability is over $\tilde{f}$'s randomness. Having $\delta = \sfrac{1}{n}$ and $\eps = \sfrac{1}{n}$, suppose now that we make $O\left(\frac{\log (\sfrac{1}{\delta})}{\eps^2}\right) = O\left(n^2 \log n\right)$ queries to $\tilde{f}$ and output the majority; then Remark 4.x says that this resulting function will compute $f$ with very high probability. To turn this intuition into a proof, the first thing we'll need is to convert a weak hypothesis for $f^{\oplus n^4}$ (i.e., a circuit $C$ such that $\Corr(f^{\oplus n^4}, C) \geq \sfrac{1}{n}$) into something resembling $\tilde{f}$. To do so, we will view $f^{\oplus n^4}$ as computing $f$ independently on $n^4$ ``blocks'' of inputs $x_1, \ldots, x_{n^4} \in \pmon$, and show that there must exist at least one block where $C$ is ``somewhat'' correct on ``most'' inputs to that block.
+where this probability is over $\tilde{f}$'s randomness. We can think of $\tilde{f}$ as a weak hypothesis for $f$ which we want to convert into a strong hypothesis. Having $\delta = \sfrac{1}{n}$ and $\eps = \sfrac{1}{n}$, suppose now that we make $O\left(\frac{\log (\sfrac{1}{\delta})}{\eps^2}\right) = O\left(n^2 \log n\right)$ queries to $\tilde{f}$ and output the majority; then Remark 4.x says that this resulting function will compute $f$ with very high probability. To turn this intuition into a proof, the first thing we'll need is to convert a weak hypothesis for $f^{\oplus n^4}$ (i.e., a circuit $C$ such that $\Corr(f^{\oplus n^4}, C) \geq \sfrac{1}{n}$) into something resembling $\tilde{f}$. To do so, we will view $f^{\oplus n^4}$ as computing $f$ independently on $n^4$ ``blocks'' of inputs $x_1, \ldots, x_{n^4} \in \pmon$, and show that there must exist at least one block where $C$ is ``somewhat'' correct on ``most'' inputs to that block.
 
 More concretely, suppose that $i \in [n^4]$ and $x \in \pmon$. We will define the cylinder $\Cyl_i(x) \subseteq \pmo^{n \times n^4}$ centered at $x$ and $i$ to be the subset of inputs which have the value $x$ fixed in the $i$-th block,
 \begin{equation*}
@@ -475,6 +467,16 @@ Thus, for a randomly chosen $\cS$, we can efficiently construct a circuit $C_{\c
     \Pr_{\cS}[C_\cS(x) \neq f(x) \text{ on some } x \in G] \leq \sum_{x \in G} \Pr_{\cS}[C_\cS(x) \neq f(x)] \leq |G|2^{-2n} \leq 2^{-n}.
 \end{equation*}
 Thus, with very high probability, a randomly drawn $C_{\cS}$ will compute $f$ correctly on every $x \in G$. Note that we can efficiently construct a random $C_\cS$ by drawing $t = O(n^3)$ random tuples $z$, querying $f$ on these inputs, constructing $C_z$ for each, then outputting the circuit which computes the majority over all of these $C_z$. Since at least a $1 - \sfrac{1}{n}$ fraction of inputs are ``good,'' a random $C_\cS$ will compute $f$ to accuracy at least $1 - \sfrac{1}{n}$ with very high probability. 
+
+To complete the proof, we need to deal with the fact that we don't know which block $i \in [n^4]$ is good. Instead of finding $i$ ahead of time, we will use the process above to construct a list of $n^4$ circuits $C_1, \ldots, C_{n^4}$ and use the fact that we have query access to $f$ to ``test'' which of these circuits corresponds to the good block.
+
+\begin{proof}[Proof \textup{(Of Theorem 4.x)}]
+    Suppose that $f \in \cF$ and $\cF$ is closed under $\XOR{}$. Consider the following algorithm for strongly learning $\cF$. Since $f^{\oplus n^4} \in \cF$ we can weakly learn $\cF$, we can find with high probability a circuit $C$ such that 
+    \begin{equation*}
+        \Corr\left(f^{\oplus n^4}, C\right) \geq \frac{1}{n}.
+    \end{equation*}
+    For each $j \in [n^4]$, choose a random $\cS$ and construct the circuit $C_\cS^{(j)}$ using the process above. To test whether this circuit computes $f$ to an accuracy of $1 - \sfrac{1}{n}$, we can query $\poly(n)$ many examples $(x, f(x))$ and test whether it computes a roughly $1 - \sfrac{1}{n}$ fraction of them correctly. For any $j \in [n^4]$, if $j$ is the good block, this process will output a good circuit for $f$ with very high probability. Thus, since at least one block is good, repeating the process above for every block will output at least one circuit computing $f$ to accuracy $1 - \sfrac{1}{n}$ with high probability. Thus, we can strongly learn $\cF$.
+\end{proof}
 
 
 \subsection{Uniform Hardness Amplification and Boosting}
