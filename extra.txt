@@ -126,3 +126,38 @@ Worst to mild hardness alg
 proof that the code can be locally decoded
 
 To see why this is a good idea, consider that since $\delta(c, \tilde{c}) \leq \sfrac{1}{28}$, there can be at most a $\sfrac{1}{7}$ blocks of Hadamard codewords which are corrupted beyond a distance of $\sfrac{1}{4}$. Thus the local decoder $\LDec_\Had$ with be able to decode a $1 - \sfrac{1}{7}$ fraction of these blocks. Therefore, the codeword which $\LDec_\RM$ queries will have distance at most $\sfrac{1}{7}$ from the polynomial represented by $c$, and thus it will locally decode $c$ with high probability.
+
+
+
+\begin{center}
+    \begin{tikzpicture}
+        \path[draw] (-6.5, -2) rectangle (-2.5, 2);
+        \path[draw,use Hobby shortcut,closed=true, pattern=north east lines]
+        (-4,.3) .. (-4.4,.4) .. (-5.6, -.3);
+        \node[fill=white] at (-4.6, -.5) {$H_1$};
+        \node[] at (-4.5, 2.35) {$C_1$};
+
+
+        \path[draw] (-2, -2) rectangle (2, 2);
+        \path[draw,use Hobby shortcut,closed=true, pattern=north east lines]
+        (0,.3) .. (.4,1) .. (.6,1.6) .. (1.4,1.4) .. (1.6, .3);
+        \node[fill=white] at (.9, .7) {$H_2$};
+        \node[] at (0, 2.35) {$C_2$};
+
+        \path[draw] (2.5, -2) rectangle (6.5, 2);
+        \path[draw,use Hobby shortcut,closed=true, pattern=north east lines]
+        (4,.3) .. (4.4,.5) .. (5.6, -.3);
+        \node[fill=white] at (4.7, -.3) {$H_3$};
+        \node[] at (4.5, 2.35) {$C_3$};
+
+        \draw[decorate, decoration={brace,amplitude=5pt, mirror}] 
+        (-6.75, -2.25) -- (6.75, -2.25) node[midway, yshift=-.5cm]{};
+
+        \draw[->] (0, -2.4) -- (0, -2.8);
+
+        \path[draw] (-2, -7) rectangle (2, -3);
+        \path[draw,use Hobby shortcut,closed=true, pattern=north east lines]
+        (-.1,-5) .. (.4,-4.4) .. (1.6, -4.7);
+        \node[fill=white] at (.8, -5) {$H$};
+    \end{tikzpicture}
+\end{center}

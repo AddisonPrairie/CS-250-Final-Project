@@ -80,14 +80,14 @@ Thus, the task of constructing such a PRG reduces to finding an average case har
 This section of the paper is meant to outline the connection between hardness and randomness, demonstrating how we can convert assumptions about functions which are hard to efficient PRGs. As a warm up, we begin by proving theorem 3.x. We will need the following standard fact in complexity theory.
 
 \begin{fact}{3.x}
-    Suppose that there exists a polynomial time algorithm $A$ computing $f$. Then there exists a polynomial size circuit $C$ computing $f$.
+    Suppose that there exists a polynomial time algorithm $\cA$ computing $f$. Then there exists a polynomial size circuit $C$ computing $f$.
 \end{fact}
 
 Thus, any PRG which can fool circuits can fool Turing machines as well; for reasons discussed later, it we will often find it easier to construct PRGs against circuits.
 
-\begin{proof}[Proof \textup{(of Theorem 3.x)}] Suppose that $f \in \BPP$, so that there exists a polynomial time algorithm $A$ probabilistically computing $f$ using $r = \poly(n)$ random bits. When computing $f$ on $x \in \pmon$, we will view $A$ as taking two inputs: the string $x$, and a string of random bits $u \in \pmo^{r}$. The fact that $A$ probabilistically computes $f$ means that for every $x \in \pmon$, 
+\begin{proof}[Proof \textup{(of Theorem 3.x)}] Suppose that $f \in \BPP$, so that there exists a polynomial time algorithm $\cA$ probabilistically computing $f$ using $r = \poly(n)$ random bits. When computing $f$ on $x \in \pmon$, we will view $\cA$ as taking two inputs: the string $x$, and a string of random bits $u \in \pmo^{r}$. The fact that $\cA$ probabilistically computes $f$ means that for every $x \in \pmon$, 
 \begin{equation*}
-    \Pr_{u \backsim U_r}[A(x, u) = f(x)] \geq \sfrac{2}{3}. 
+    \Pr_{u \backsim U_r}[\cA(x, u) = f(x)] \geq \sfrac{2}{3}. 
 \end{equation*}
 Using fact 3.x, we can convert this to a $\poly(n)$ sized circuit $C$ computing the same function. For any $x \in \pmon$, we will write $C^x$ to denote the circuit which fixes the first $n$ inputs of $C$ to that particular string.
 \begin{equation*}
@@ -97,15 +97,15 @@ Write $m = |C|$, suppose that $G$ is an $(O(\log m), m)$-PRG computable in $\pol
 \begin{equation*}
     \Pr_{s \backsim U_{O(\log n)}}[C^{x}(G(s)) = f(x)] \geq \sfrac{2}{3} - \sfrac{1}{10} \geq .55.
 \end{equation*}
-Since $C$ and $A$ compute the same function, 
+Since $C$ and $\cA$ compute the same function, 
 \begin{equation*}
-    \Pr_{s \backsim U_{O(\log n)}}[A(x, s) = f(x)] \geq  .55. \tag{1}
+    \Pr_{s \backsim U_{O(\log n)}}[\cA(x, s) = f(x)] \geq  .55. \tag{1}
 \end{equation*}
-Now consider the following deterministic polynomial time algorithm $A'$ for computing $f$: on input $x \in \pmon$, iterate over all seed $s \in \pmo^{O(\log n)}$, computing $A(x, s)$; then, output whichever bit appears more among these computations. $A'$ requires running $G$ and $A$ for every string in $\pmo^{O(\log m)}$. Since $m = \poly(n)$, the total running time of $A'$ is 
+Now consider the following deterministic polynomial time algorithm $\cA'$ for computing $f$: on input $x \in \pmon$, iterate over all seed $s \in \pmo^{O(\log n)}$, computing $\cA(x, s)$; then, output whichever bit appears more among these computations. $\cA'$ requires running $G$ and $\cA$ for every string in $\pmo^{O(\log m)}$. Since $m = \poly(n)$, the total running time of $\cA'$ is 
 \begin{equation*}
     \left|\pmo^{O(\log n)}\right| \cdot \poly(m) \cdot \poly(n) = 2^{O(\log n)} \cdot \poly(n) = \poly(n).
 \end{equation*}
-Moreover, by the guarantee of equation (1), the bit which appears more often among these computations will be the value of $f$. Thus, $A'$ is a deterministic polynomial time algorithm computing $f$, so that $f \in \P$.
+Moreover, by the guarantee of equation (1), the bit which appears more often among these computations will be the value of $f$. Thus, $\cA'$ is a deterministic polynomial time algorithm computing $f$, so that $f \in \P$.
 \end{proof}
 
 \subsubsection{A Simple PRG}
@@ -255,12 +255,7 @@ While we will not go through the analysis here, one can prove Claim 3.x with the
 \subsection{Worst Case Hardness to Mild Hardness}
 
 \begin{theorem}{3.x}
-    Suppose that $\cC$ is a $[m^2, m]_2$ code with the following properties:
-    \begin{enumerate}
-        \item the encoding map $\Enc : \pmo^m \rightarrow \pmo^{m^2}$ is computable in $\poly(m)$ time,
-        \item there exists a local decoding algorithm $\LDec$ which can correct up to a relative distance of $.05$ running in $\polylog(m)$ time.
-    \end{enumerate}
-    Then the worst case hardness assumption implies the mild hardness assumption.
+    Suppose that $\cC$ is a $[m^2, m]_2$ code with the following properties: (1) the encoding map $\Enc : \pmo^m \rightarrow \pmo^{m^2}$ is computable in $\poly(m)$ time, (2) there exists a local decoding algorithm $\LDec$ which can correct up to a relative distance of $.05$ running in $\polylog(m)$ time. Then the worst case hardness assumption implies the mild hardness assumption.
 \end{theorem}
 
 \begin{proof}
@@ -273,11 +268,7 @@ While we will not go through the analysis here, one can prove Claim 3.x with the
     \begin{equation*}
         \Corr\left(\hat{f}, 2^{\delta' n}\right) \leq .9.
     \end{equation*}
-    To prove this, suppose for the sake of contradiction that there existed a circuit $C$ of size $2^{\delta' n}$ with correlation $\geq .9$ with $\hat{f}$. We will use $C$ to construct a circuit perfectly computing $f$. To start, consider the truth table $\TT(C)$ of the function computed by $C$. Because $C$ achieves high correlation with $\hat{f}$, the relative distance between $\TT(C)$ and $\TT(\hat{f})$ must be small,
-    \begin{equation*}
-        \delta\left(\TT(C), \TT(\hat{f})\right) < .05.
-    \end{equation*}
-    Thus, if we give our local decoder $\LDec$ for $\cC$ query access to $\TT(C)$, it will with probability $\sfrac{2}{3}$ output any particular bit of $\TT(f)$ in $\polylog(N) = \poly(n)$ time. Consider the following randomized circuit $C_{\sfrac{2}{3}}$ which computes $f$ with probability $\sfrac{2}{3}$. On input $x \in \pmon$, run the local decoder on $x$, simulating query access to $\TT(C)$ by querying the circuit $C$ itself,
+    To prove this, suppose for the sake of contradiction that there existed a circuit $C$ of size $2^{\delta' n}$ with correlation $\geq .9$ with $\hat{f}$. We will use $C$ to construct a circuit perfectly computing $f$. To start, consider the truth table $\TT(C)$ of the function computed by $C$. Because $C$ achieves high correlation with $\hat{f}$, the relative distance between $\TT(C)$ and $\TT(\hat{f})$ must be small, $\delta\left(\TT(C), \TT(\hat{f})\right) < .05$. Thus, if we give our local decoder $\LDec$ for $\cC$ query access to $\TT(C)$, it will with probability $\sfrac{2}{3}$ output any particular bit of $\TT(f)$ in $\polylog(N) = \poly(n)$ time. Consider the following randomized circuit $C_{\sfrac{2}{3}}$ which computes $f$ with probability $\sfrac{2}{3}$. On input $x \in \pmon$, run the local decoder on $x$, simulating query access to $\TT(C)$ by querying the circuit $C$ itself,
     \begin{equation*}
         C_{\sfrac{2}{3}}(x) = \LDec^{\TT(C)}(x).
     \end{equation*}
@@ -415,45 +406,82 @@ Note that in our analysis in Theorem 3.?, we could amplify the hardness of the a
 
 
 
-\section{Boosting and Hardness Amplification}
-
-\subsection{Smooth Boosters and The Hardcore Theorem}
-
-\begin{center}
-    \begin{tikzpicture}
-        \path[draw] (-6.5, -2) rectangle (-2.5, 2);
-        \path[draw,use Hobby shortcut,closed=true, pattern=north east lines]
-        (-4,.3) .. (-4.4,.4) .. (-5.6, -.3);
-        \node[fill=white] at (-4.6, -.5) {$H_1$};
-        \node[] at (-4.5, 2.35) {$C_1$};
+\section{Boosting and Uniform Hardness Amplification}
 
 
-        \path[draw] (-2, -2) rectangle (2, 2);
-        \path[draw,use Hobby shortcut,closed=true, pattern=north east lines]
-        (0,.3) .. (.4,1) .. (.6,1.6) .. (1.4,1.4) .. (1.6, .3);
-        \node[fill=white] at (.9, .7) {$H_2$};
-        \node[] at (0, 2.35) {$C_2$};
+\begin{definition}{4.x}
+    Suppose that $\cF$ is a class of functions. We say that a probabilistic algorithm $\cA$ learns $\cF$ to accuracy $\gamma$ if, given query access to some $f \in \cF$, $\cA$ runs in $\poly(n)$ time and produces with probability $99\%$ a circuit $C$ such that 
+    \begin{equation*}
+        \Corr(f, C) \geq \gamma.
+    \end{equation*}
+\end{definition}
 
-        \path[draw] (2.5, -2) rectangle (6.5, 2);
-        \path[draw,use Hobby shortcut,closed=true, pattern=north east lines]
-        (4,.3) .. (4.4,.5) .. (5.6, -.3);
-        \node[fill=white] at (4.7, -.3) {$H_3$};
-        \node[] at (4.5, 2.35) {$C_3$};
 
-        \draw[decorate, decoration={brace,amplitude=5pt, mirror}] 
-        (-6.75, -2.25) -- (6.75, -2.25) node[midway, yshift=-.5cm]{};
+In general, we will call an algorithm which learns $\cF$ to accurracy $1 - \sfrac{1}{n}$ a \emph{strong learner}, and an algorithm which learns $\cF$ to accuracy $\sfrac{1}{n}$ a \emph{weak learner}.
 
-        \draw[->] (0, -2.4) -- (0, -2.8);
 
-        \path[draw] (-2, -7) rectangle (2, -3);
-        \path[draw,use Hobby shortcut,closed=true, pattern=north east lines]
-        (-.1,-5) .. (.4,-4.4) .. (1.6, -4.7);
-        \node[fill=white] at (.8, -5) {$H$};
-    \end{tikzpicture}
-\end{center}
 
-\subsection{Boosting via the XOR Lemma}
+\subsection{Boosting With XOR}
 
+
+
+
+
+\begin{theorem}{4.x}[Boosting with XOR \cite{BonehLipton}]
+    Suppose that $\cF$ is closed under \XOR{} and can be efficiently weakly learned. Then $\cF$ can be efficiently strongly learned.
+\end{theorem}
+
+Before jumping into the proof, let's see how such a boosting algorithm can be used. 
+
+The strategy for the proof can be summed up in the following remark.
+
+\begin{remark}{4.x}
+    Fix a small $\eps, \delta > 0$. Suppose that $c$ is a coin which is biased in an unknown direction: the probability it heads is either $\sfrac{1}{2} + \eps$ or $\sfrac{1}{2} - \eps$, but we're unsure which. If we want to determine the direction of the bias, how many flips do we need until we can guess correctly with probability $1 - \delta$? Applying the Chernoff bound, if we make $O\left(\frac{\log \left(\sfrac{1}{\delta}\right)}{\eps^2}\right)$ independent flips and take the more common value among the resulting flips, this will correctly tell us the direction of the bias with probability $1 - \delta$.
+\end{remark}
+
+For the remainder of this section, fix an $f : \pmon \rightarrow \pmo$ which we are trying to learn. Suppose that we had access to a randomized function $\tilde{f} : \pmon \rightarrow \pmo$ such that for a $(1 - \sfrac{1}{n})$ fraction of ``good'' inputs $x \in \pmon$, 
+\begin{equation*}
+    \Pr[\tilde{f}(x) = f(x)] > \frac{1}{2} + \frac{1}{n},
+\end{equation*}
+where this probability is over $\tilde{f}$'s randomness. Having $\delta = \sfrac{1}{n}$ and $\eps = \sfrac{1}{n}$, suppose now that we make $O\left(\frac{\log (\sfrac{1}{\delta})}{\eps^2}\right) = O\left(n^2 \log n\right)$ queries to $\tilde{f}$ and output the majority; then Remark 4.x says that this resulting function will compute $f$ with very high probability. To turn this intuition into a proof, the first thing we'll need is to convert a weak hypothesis for $f^{\oplus n^4}$ (i.e., a circuit $C$ such that $\Corr(f^{\oplus n^4}, C) \geq \sfrac{1}{n}$) into something resembling $\tilde{f}$. To do so, we will view $f^{\oplus n^4}$ as computing $f$ independently on $n^4$ ``blocks'' of inputs $x_1, \ldots, x_{n^4} \in \pmon$, and show that there must exist at least one block where $C$ is ``somewhat'' correct on ``most'' inputs to that block.
+
+More concretely, suppose that $i \in [n^4]$ and $x \in \pmon$. We will define the cylinder $\Cyl_i(x) \subseteq \pmo^{n \times n^4}$ centered at $x$ and $i$ to be the subset of inputs which have the value $x$ fixed in the $i$-th block,
+\begin{equation*}
+    \Cyl_i(x) = \left\{(z_1, \ldots, z_{i - 1}, x, z_{i + 1}, \ldots, z_{n^4}) : z_1, \ldots, z_{n^4} \in \pmon\right\}.
+\end{equation*}
+For a fixed $i$ and any $x \in \pmon$, by ``somewhat'' correct, we mean that $\Corr_{\Cyl_i(x)}(f^{\oplus n^4}, C) \geq \sfrac{1}{n}$, and by ``most'' inputs, we mean that this property holds for a $1 - \sfrac{1}{n}$ fraction of $x \in \pmon$. We wish to prove that an $i$ such that ``most'' inputs are computed ``somewhat'' correctly exists.
+
+\begin{lemma}{4.x}[Main Lemma, \cite{BonehLipton}]
+    Suppose that $C$ is a circuit and $f : \pmon \rightarrow \pmo$ is such that $\Corr(f^{\oplus n^4}, C) \geq \sfrac{1}{n}$. Then there exists a particular $i \in [n^4]$ such that, for $1 - \sfrac{1}{n}$ fraction of ``good'' inputs $x \in \pmon$,
+    \begin{equation*}
+        \Corr_{\Cyl_i(x)}\left(f^{\oplus n^4}, C\right) \geq \Omega\left(\frac{1}{n}\right).
+    \end{equation*}
+\end{lemma}
+
+To see why this is useful, let's assume for a moment that we know the particular index $i \in [n^4]$ guaranteed to exist by Lemma 4.x, and denote by $G \subseteq \pmon$ the set of ``good'' $x \in \pmon$. Examining a fixed $x \in G$, suppose we draw independent random $z_1, \ldots, z_{i - 1}, z_{i + 1}, \ldots, z_{n^4} \backsim \pmon$. Then the probability that $C$ computes $f^{\oplus k}$ correctly on this input is
+\begin{align*}
+    \Pr_{z_1, \ldots, z_{n^4} \backsim U_n}[f^{\oplus n^4}(z_1 - x - z_{n^4}) = C(z_1 - x - z_{n^4})] & = \Pr_{z \backsim \Cyl_i(x)}[f^{\oplus n^4}(z) = C(z)], \\ & = \frac{1}{2} + \Corr_{\Cyl_i(x)}(f^{\oplus n^4}, C), \\ & \geq \frac{1}{2} + \Omega\left(\frac{1}{n}\right).
+\end{align*}
+For a randomly drawn $z = (z_1, \ldots, z_{n^4})$, define the circuit $C_z$ on input $x \in \pmo$ by 
+\begin{equation*}
+    C_z(x) = C(z_1 - x - z_{n^4}) \cdot \prod_{j \neq i} f(z_j).
+\end{equation*}
+Then if $x$ is good, the probability over our random $z$ that $C_z(x) = f(x)$ is $\sfrac{1}{2} + \Omega(\sfrac{1}{n})$. Fixing $\eps = \Omega(\sfrac{1}{n})$ and $\delta = 2^{-2n}$, if we draw a set $\cS$  of $t = O\left(\frac{\log\left(\sfrac{1}{\delta}\right)}{\eps^2}\right) = O(n^3)$ independent random $z$'s, we get a collection of circuits $\cS = \{C_{z_1}, \ldots, C_{z_t}\}$ taking the majority of these circuits will compute $f$ correctly with high probability,
+\begin{equation*}
+    \Pr_{\cS}\left[\Maj_{C_z \in \cS}\left(C_z(x)\right) = f(x)\right] \geq 1 - \delta = 1 - 2^{-2n}.
+\end{equation*}
+Thus, for a randomly chosen $\cS$, we can efficiently construct a circuit $C_{\cS}$ such that for any $x \in G$, $C_{\cS}$ computes $f$ on $x$ with high probability. To convert this into a single circuit which computes $f$ correctly on \emph{every} $x \in G$, note that by the union bound, 
+\begin{equation*}
+    \Pr_{\cS}[C_\cS(x) \neq f(x) \text{ on some } x \in G] \leq \sum_{x \in G} \Pr_{\cS}[C_\cS(x) \neq f(x)] \leq |G|2^{-2n} \leq 2^{-n}.
+\end{equation*}
+Thus, with very high probability, a randomly drawn $C_{\cS}$ will compute $f$ correctly on every $x \in G$. Note that we can efficiently construct a random $C_\cS$ by drawing $t = O(n^3)$ random tuples $z$, querying $f$ on these inputs, constructing $C_z$ for each, then outputting the circuit which computes the majority over all of these $C_z$. Since at least a $1 - \sfrac{1}{n}$ fraction of inputs are ``good,'' a random $C_\cS$ will compute $f$ to accuracy at least $1 - \sfrac{1}{n}$ with very high probability. 
+
+
+\subsection{Uniform Hardness Amplification and Boosting}
+
+
+\bibliographystyle{alpha}
+\bibliography{references}
 
 
 \end{document}
