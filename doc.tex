@@ -16,9 +16,6 @@
 
 \tableofcontents
 
-
-\section{Preliminaries}
-
 \section{Hardness Amplification with ECCs}
 
 \begin{assumption}{1} \label{a-1}
@@ -42,17 +39,18 @@
     \end{equation*}
 \end{assumption}
 
-We will prove that, given a worst case hard function $f$, we can transform it into an average case $f'$.
 
-\begin{theorem}{3.x} If there exists a function $f$ satisfying the worst case hardness assumption, there exists a function $f'$ satisfying the average case hardness assumption.
 
+
+\begin{theorem}{2.1}[\cite{iw97}, \cite{STV99}]\label{t-2-1}
+    If there exists a function $f$ satisfying the worst case hardness assumption, there exists a function $f'$ satisfying the average case hardness assumption.
 \end{theorem}
 
 \subsection{Why Hardness Amplification?}
 
-While hardness amplification in other fields such as cryptography, we will use it to construct \emph{pseudorandom generators}, a special type of function which, given a small number of truly random bits, output a large number of psuedorandom bits which nonetheless indistinguishable from an equivalent number of truly random bits to computationally bounded algorithms. While such functions have been designed for a variety of computational models, we will be interested in the most general of these models: Turing machines and circuits.
+While hardness amplification is useful in other fields such as cryptography, we will use it to construct \emph{pseudorandom generators}, a special type of function which, given a small number of truly random bits, output a large number of psuedorandom bits which nonetheless indistinguishable from an equivalent number of truly random bits to computationally bounded algorithms. While such functions have been designed for a variety of computational models, we will be interested in the most general of these models: Turing machines and circuits.
 
-\begin{definition}{3.x}
+\begin{definition}{2.1}
     We say that a function $G : \pmo^\ell \rightarrow \pmo^{n}$ is an $(\ell, n)$-PRG if, for any size $n$ circuit $C$ over $n$ inputs, 
     \begin{equation*}
         \left|\Pr_{x \backsim U_n}[C(x)] - \Pr_{s \backsim U_\ell}[C(G(s))]\right| < \frac{1}{10}.
@@ -62,34 +60,29 @@ While hardness amplification in other fields such as cryptography, we will use i
 
 The definition above says that, up to a small (i.e., $\sfrac{1}{10})$ difference, the generator $G$ ``fools'' any circuit $C$ into believing the inputs we've given it are truly random. Why would we be interested in such a function? The theorem below demonstrates that, given a PRG which has a relatively small seed length and is efficiently computable, any problem solvable in \emph{randomized} polynomial time is also solvable in \emph{deterministic} polynomial time.
 
-\begin{theorem}{3.x} Suppose that $G$ is a $(O(\log n), n)$-PRG computable in $\poly(n)$ time. Then $\P = \BPP$.
+\begin{theorem}{2.2} \label{t-2-2}
+    Suppose that $G$ is a $(O(\log n), n)$-PRG computable in $\poly(n)$ time. Then $\P = \BPP$.
 \end{theorem}
 
-Given that the $\P$ versus $\BPP$ problem remains unsolved, it should be clear that we don't know whether such PRGs exist. However, in xxx, xxx proved that, given an average case hard function $f$, one can construct a PRG matching the requirements in Theorem 3.x.
+Given that the $\P$ versus $\BPP$ problem remains unsolved, it should be clear that we don't know whether such PRGs exist. However, in 1994 Nisan and Wigderson \cite{NW94} proved that given an average case hard function $f$, one can construct a PRG matching the requirements in \hyperref[t-2-2]{Theorem 2.2}.
 
-\begin{theorem}{3.x}
+\begin{theorem}{2.3}[Nisan-Wigderson Generator, \cite{NW94}] \label{t-2-3}
     Given the average case hardness assumption, there exists a $(O(\log n), n)$-PRG.
 \end{theorem}
 
-Thus, the task of constructing such a PRG reduces to finding an average case hard function, and supposing we can amplify hardness as in Theorem 3.x, this is in fact equal to finding a worst case hard function. By combining theorems 3.x, 3.x, and 3.x, we have the following:
+Thus, the task of constructing such a PRG reduces to finding an average case hard function, and supposing we can amplify hardness as in \hyperref[t-2-1]{Theorem 2.1}, this is in fact equal to finding a worst case hard function. By combining Theorems \hyperref[t-2-1]{2.1}, \hyperref[t-2-2]{2.2}, and \hyperref[t-2-3]{2.3}, we have the following.
 
-\begin{corollary}{3.x}
+\begin{corollary}{2.1}
     If there exists some $\delta > 0$ such that \SAT{} requires circuits of size $\Omega(2^{\delta n})$, then $\P = \BPP$.
 \end{corollary}
 
-This section of the paper is meant to outline the connection between hardness and randomness, demonstrating how we can convert assumptions about functions which are hard to efficient PRGs. As a warm up, we begin by proving theorem 3.x. We will need the following standard fact in complexity theory.
+Section 2 is meant to outline the connection between hardness and randomness, demonstrating how we can convert assumptions about functions which are hard to efficient PRGs. As a warm up, we begin by proving \hyperref[t-2-2]{Theorem 2.2}.
 
-\begin{fact}{3.x}
-    Suppose that there exists a polynomial time algorithm $\cA$ computing $f$. Then there exists a polynomial size circuit $C$ computing $f$.
-\end{fact}
-
-Thus, any PRG which can fool circuits can fool Turing machines as well; for reasons discussed later, it we will often find it easier to construct PRGs against circuits.
-
-\begin{proof}[Proof \textup{(of Theorem 3.x)}] Suppose that $f \in \BPP$, so that there exists a polynomial time algorithm $\cA$ probabilistically computing $f$ using $r = \poly(n)$ random bits. When computing $f$ on $x \in \pmon$, we will view $\cA$ as taking two inputs: the string $x$, and a string of random bits $u \in \pmo^{r}$. The fact that $\cA$ probabilistically computes $f$ means that for every $x \in \pmon$, 
+\begin{proof}[Proof \textup{(of \hyperref[t-2-2]{Theorem 2.2})}] Suppose that $f \in \BPP$, so that there exists a polynomial time algorithm $\cA$ probabilistically computing $f$ using $r = \poly(n)$ random bits. When computing $f$ on $x \in \pmon$, we will view $\cA$ as taking two inputs: the string $x$, and a string of random bits $u \in \pmo^{r}$. The fact that $\cA$ probabilistically computes $f$ means that for every $x \in \pmon$, 
 \begin{equation*}
     \Pr_{u \backsim U_r}[\cA(x, u) = f(x)] \geq \sfrac{2}{3}. 
 \end{equation*}
-Using fact 3.x, we can convert this to a $\poly(n)$ sized circuit $C$ computing the same function. For any $x \in \pmon$, we will write $C^x$ to denote the circuit which fixes the first $n$ inputs of $C$ to that particular string.
+We can convert this to a $\poly(n)$ sized circuit $C$ computing the same function. For any $x \in \pmon$, we will write $C^x$ to denote the circuit which fixes the first $n$ inputs of $C$ to that particular string.
 \begin{equation*}
     \Pr_{u \backsim U_r}[C^{x}(u) = f(x)] \geq \sfrac{2}{3}. 
 \end{equation*}
@@ -112,7 +105,7 @@ Moreover, by the guarantee of equation (1), the bit which appears more often amo
 
 To see the key ideas used in constructing a PRG capable of derandomizing BPP, we will use the average case hardness assumption to construct a PRG which increases the size of the pseudorandom string by one bit.
 
-\begin{theorem}{3.x}
+\begin{theorem}{2.4}[\cite{NW94}]\label{t-2-4}
     Given the average case hardness assumption, there exists a $(n - 1, n)$-PRG.
 \end{theorem}
 \noindent
@@ -121,7 +114,7 @@ Have $f : \pmo^{n - 1} \rightarrow \pmo$ be an average case hard function. Our $
     G(s_1, \ldots, s_{n - 1}) = \bigl(s_1, \ldots, s_{n - 1}, f(s_1, \ldots, s_{n - 1})\bigr).
 \end{equation*}
 In this case, the first $n - 1$ bits are truly random, and so no circuit will be able to distinguish them from uniform random bits. For the last bit, since any small circuit can't do much better than guessing the value of $f$, this bit will also appear essentially random. To formalize this, we will use Yao's next bit prediction lemma. Intuitively, it reduces the task of analyzing a circuit's behavior on an entire psuedorandom string to analyzing it's ability to predict a particular bit given the previous bits.
-\begin{lemma}{3.x}[Yao's Next Bit Prediction Lemma]
+\begin{lemma}{2.1}[Yao's next bit prediction lemma, \cite{Yao82}]\label{l-2-1}
     Write $G(s) = (z_1, \ldots, z_n)$. Suppose that for all $i \in [n]$, any circuit $C : \pmo^{i - 1} \rightarrow \pmo$ of size $n$ has 
     \begin{equation*}
         \Corr\left(C(z_1, \ldots, z_{i - 1}), z_i\right) < \frac{\epsilon}{n}. \tag{1}
@@ -131,10 +124,10 @@ In this case, the first $n - 1$ bits are truly random, and so no circuit will be
         \left|\Pr_{x \backsim U_n}[C(x)] - \Pr_{s \backsim U_\ell}[C(G(s))]\right| < \epsilon. \tag{2}
     \end{equation*}
 \end{lemma}
-Note that fixing $\epsilon = \sfrac{1}{10}$, the condition in equation (2) says that $G$ is a $(n - 1, n)$-PRG. Thus, to prove that Theorem 3.x, we just need to show that $G$ satisfies the hypothesis of Lemma 3. x: the $i$-th bit should be unpredictable given the first $(i - 1)$ bits.
+Note that fixing $\epsilon = \sfrac{1}{10}$, the condition in equation (2) says that $G$ is a $(n - 1, n)$-PRG. Thus, to prove  \hyperref[t-2-4]{Theorem 2.4}, we just need to show that $G$ satisfies the hypothesis of \hyperref[l-2-1]{Lemma 2.1}: the $i$-th bit should be unpredictable given the first $i - 1$ bits.
 
-\begin{proof}[Proof \textup{(Of Theorem 3.x)}.]
-    By Lemma 3.x, it suffices to show that for any $i \in [n]$ and circuit $C$ of size $n$, 
+\begin{proof}[Proof \textup{(Of \hyperref[t-2-4]{Theorem 2.4})}.]
+    By \hyperref[l-2-1]{Lemma 2.1}, it suffices to show that for any $i \in [n]$ and circuit $C$ of size $n$, 
     \begin{equation*}
         \Corr(C(z_1, \ldots, z_{i - 1}), z_i) < \frac{1}{10 n}. \tag{3}
     \end{equation*}
@@ -151,8 +144,8 @@ Note that fixing $\epsilon = \sfrac{1}{10}$, the condition in equation (2) says 
 
 \subsubsection{The Nisan-Wigderson Generator}
 
-Extending the analysis above, Nisan and Wigderson were able to use the average case hardness assumption to construct a pseudorandom generator which stretches the seed bits exponentially further. While we won't give the of this fact in this section, we will describe their construction; the analysis that such a construction is in fact a good PRG is similar to that in section 3.1.1.
-\begin{theorem}{3.x}
+Extending the analysis above, Nisan and Wigderson were able to use the average case hardness assumption to construct a pseudorandom generator which stretches the seed bits exponentially further. While we won't give the of this fact in this section, we will describe their construction; the analysis that such a construction is in fact a good PRG is similar to that in the previous section.
+\begin{theorem}{2.5}[Nisan-Wigderson Generator, \cite{NW94}]
     Given the average case hardness assumption, there exists a $(O(\log n), n)$-PRG.
 \end{theorem}
 \noindent
@@ -236,7 +229,7 @@ Pictorally, the function $G_\cS$ looks something like this.
     \end{tikzpicture}
 \end{center}
 \noindent
-The most important factor in our choice of $\cS$ is what we mean by each subset being ``roughly disjoint.'' If we wanted to make them truly disjoint, we'd need at least our seed length to be atleast $\sfrac{2}{\delta} \cdot n \cdot \log n$, which defeats the purpose of a PRG; thus, we'll need to compromise by allowing some overlap between different $S_i$ and $S_j$. However, we cannot have two of these subsets overlap too much: as an extreme example, if $S_i = S_j$ for some $i < j$, then the $i$ and $j$-th bits of $G$ will be perfectly correlated, preventing us from using Yao's Next Bit Prediction Lemma in our analysis.
+The most important factor in our choice of $\cS$ is what we mean by each subset being ``roughly disjoint.'' If we wanted to make them truly disjoint, we'd need at least our seed length to be atleast $\sfrac{2}{\delta} \cdot n \cdot \log n$, which defeats the purpose of a PRG; thus, we'll need to compromise by allowing some overlap between different $S_i$ and $S_j$. However, we cannot have two of these subsets overlap too much: as an extreme example, if $S_i = S_j$ for some $i < j$, then the $i$ and $j$-th bits of $G$ will be perfectly correlated, preventing us from using Yao's next bit prediction lemma in our analysis.
 
 Thus, the key question is how we can balance between these two extremes: we need some overlap so that the seed length is small, but not too much that different bits in the output are too correlated. As it turns out, we can ensure that no two bits $i$ and $j$ will be too correlated so long as $|S_i \cap S_j| < \log n$; thus, we can construct a good PRG so long as $\cS$ satisfies the following properties:
 \begin{enumerate}
@@ -246,15 +239,15 @@ Thus, the key question is how we can balance between these two extremes: we need
 \end{enumerate}
 It is not obvious that such a collection exists:  can we even find an exponential (in $\log n$) number of subsets of $O(\log n)$ bits, each of size $O(\log n)$, which have overlap at most $\log n$? As it turns out, objects satisfying these properties have a name: a collection $\cS$ satisfying properties 1-3 is called a $(c \log n, \sfrac{2}{3} \cdot \log n, \log n, n)$-\emph{combinatorial design}. Moreover, for a large enough constant $c > 1$, such combinatorial designs exist:
 
-\begin{claim}{3.x}
+\begin{lemma}{2.2}[\cite{NW94}]\label{l-2-2}
     There exists a constant $c > 1$ such that a $(c \log n, \sfrac{2}{3} \cdot \log n, \log n, n)$-combinatorial design exists and can be produced in $\poly(n)$ time.
-\end{claim}
+\end{lemma}
 
-While we will not go through the analysis here, one can prove Claim 3.x with the natural greedy algorithm: start with an empty collection $\cS$ and iterate through all subsets of size $\sfrac{2}{\delta} \cdot \log n$, adding any subset to $\cS$ which does not overlap too much with the subsets already added to $\cS$. Thus, we can find a good combinatorial design $\cS$ and, although we haven't proved it here, this can be used to construct $G_\cS$, a good $(O(\log n), n)$-PRG. Thus, we can construct good PRGs from average case hard functions, allowing us to use such an assumption to derandomize BPP.
+While we will not go through the analysis here, one can prove \hyperref[l-2-2]{Lemma 2.2} with the natural greedy algorithm: start with an empty collection $\cS$ and iterate through all subsets of size $\sfrac{2}{\delta} \cdot \log n$, adding any subset to $\cS$ which does not overlap too much with the subsets already added to $\cS$. Thus, we can find a good combinatorial design $\cS$ and, although we haven't proved it here, this can be used to construct $G_\cS$, a good $(O(\log n), n)$-PRG. Thus, we can construct good PRGs from average case hard functions, allowing us to use such an assumption to derandomize BPP.
 
 \subsection{Worst Case Hardness to Mild Hardness}
 
-\begin{theorem}{3.x}
+\begin{theorem}{2.6}\label{t-2-6}
     Suppose that $\cC$ is a $[m^2, m]_2$ code with the following properties: (1) the encoding map $\Enc : \pmo^m \rightarrow \pmo^{m^2}$ is computable in $\poly(m)$ time, (2) there exists a local decoding algorithm $\LDec$ which can correct up to a relative distance of $.05$ running in $\polylog(m)$ time. Then the worst case hardness assumption implies the mild hardness assumption.
 \end{theorem}
 
@@ -285,9 +278,9 @@ While we will not go through the analysis here, one can prove Claim 3.x with the
 
 \subsubsection{Reed-Muller and Hadamard Codes}
 
-Theorem 3.x reduces the task of hardness amplification to finding a suitable error correcting code. The most important property of this code is that it is locally decodable. As a starting point, let's take a look at a code which has good rate, distance and is locally correctable: the Reed-Muller code.
+\hyperref[t-2-6]{Theorem 2.6} reduces the task of hardness amplification to finding a suitable error correcting code. The most important property of this code is that it is locally decodable. As a starting point, let's take a look at a code which has good rate, distance and is locally correctable: the Reed-Muller code.
 
-\begin{definition}{3.x}[Reed-Muller Codes]
+\begin{definition}{2.2}[Reed-Muller Codes]
     Suppose $\F$ is a finite field of size $q$. The Reed-Muller code $\RM_q(m, d)$ is the set of all evaluations of $d$-degree $m$-variate polynomials over $\F_q$,
     \begin{equation*}
         \RM_q(m ,d) = \left\{(f(\gamma_1), f(\gamma_2), \ldots, f(\gamma_{q^m})) : f \in \F_q[X_1, \ldots, X_m], \, \deg (f) \leq d\right\},
@@ -297,11 +290,11 @@ Theorem 3.x reduces the task of hardness amplification to finding a suitable err
 
 In class, we saw the following guarantees for locally correcting the Reed-Muller code.
 
-\begin{claim}{3.x}
+\begin{claim}{2.1}
     There exists a local corrector $\LCor_\RM$ for the Reed-Muller code $\RM_q(m, r)$ which locally corrects up to a relative distance of $\delta \leq \sfrac{1}{7}$ with $q$ queries in time $\poly(m, q, r)$.
 \end{claim}
 
-For a second, let's put aside the fact that we can only locally correct, rather than decode, this code, and let's also ignore the fact that it is a binary code. How should we pick $d$, $q$ and $m$ to achieve the regime required by Theorem 3.x? As a start, we need the number of queries to be poly-logarithmic in $n$, say $q = \log^3 n$. We'll also want the block length to be $\poly(n)$. Thus, we should take $m = \log n / \log \log n$, so that the block length is 
+For a second, let's put aside the fact that we can only locally correct, rather than decode, this code, and let's also ignore the fact that it is a binary code. How should we pick $d$, $q$ and $m$ to achieve the regime required by \hyperref[t-2-6]{Theorem 2.6}? As a start, we need the number of queries to be poly-logarithmic in $n$, say $q = \log^3 n$. We'll also want the block length to be $\poly(n)$. Thus, we should take $m = \log n / \log \log n$, so that the block length is 
 \begin{equation*}
     q^n = \left(\log^3 n\right)^{\log n / \log \log n} = 2^{3\log \log n \log n / \log \log n} = 2^{3\log n} = n^3.
 \end{equation*}
@@ -313,9 +306,9 @@ In this case, we need to take $d = \log^2 n$, so that
 \begin{equation*}
     k \geq \left(\frac{\log^2 n \log \log n}{\log n}\right)^{\log n / \log \log n} \geq \left(\log n\right)^{\log n / \log \log n} \geq n.
 \end{equation*}
-Finally, the distance is $\delta = 1 - d / q = 1 - 1 / \log n$; however, since we can only locally decode up to a distance of $\delta \leq \sfrac{1}{7}$, we will take that as our distance instead. Let's call this code, with the parameters above, $\RM$. To summarize, we have that $\RM$ is a $[n^3, n, \sfrac{1}{7}]_\F$ code, where $\F$ is a finite field of size $\log^3 n$. To convert this to a binary code, we can concatenate with another code which is locally correctible: the Hadamard code.
+Finally, the distance is $\delta = 1 - d / q = 1 - \sfrac{1}{\log n}$; however, since we can only locally decode up to a distance of $\delta \leq \sfrac{1}{7}$, we will take that as our distance instead. Let's call this code, with the parameters above, $\RM$. To summarize, we have that $\RM$ is a $[n^3, n, \sfrac{1}{7}]_\F$ code, where $\F$ is a finite field of size $\log^3 n$. To convert this to a binary code, we can concatenate with another code which is locally correctible: the Hadamard code.
 
-\begin{definition}{3.x}[Hadamard Codes]
+\begin{definition}{2.3}[Hadamard Codes]
     The Hadamard code $\Had_k \subseteq \pmo^{2^k}$ with parameter $k$ is the subset of truth tables of linear functions from $\pmo^k$ to $\pmo$:
     \begin{equation*}
         \Had_k = \left\{\TT\left(x \mapsto \prod_{i \in S} x_i\right) : S \subseteq [k]\right\}.
@@ -325,13 +318,13 @@ Finally, the distance is $\delta = 1 - d / q = 1 - 1 / \log n$; however, since w
 
 In class, we saw the following guarantees for locally correcting the Hadamard code.
 
-\begin{claim}{3.x}
+\begin{claim}{2.2}
     There exists a local corrector $\LCor_\Had$ for the Hadamard code $\Had_k$ which locally corrects up to a relative distance of $\delta \leq \sfrac{1}{4}$ with $2$ queries in time $O(k)$.
 \end{claim}
 
-Fixing $k = \log |\F|$, we will write $\Had$ for the Hadamard code with parameter $k$. Let's suppose for a second that we could transform each of our local correcting algorithms to local decoding algorithms. Then we claim that the concatenated code $\cC = \Had \concat \RM$ will satisfy the requirements of Theorem 3.x.
+Fixing $k = \log |\F|$, we will write $\Had$ for the Hadamard code with parameter $k$. Let's suppose for a second that we could transform each of our local correcting algorithms to local decoding algorithms. Then we claim that the concatenated code $\cC = \Had \concat \RM$ will satisfy the requirements of \hyperref[t-2-6]{Theorem 2.6}.
 
-\begin{claim}{3.x}
+\begin{claim}{2.3}
     The code $\cC$ is a $[n^3\log^3 n, n]_2$ code which can be locally decoded up to a relative distance of $\sfrac{1}{28}$ in $\polylog(n)$ time.
 \end{claim}
 
@@ -345,7 +338,7 @@ Fixing $k = \log |\F|$, we will write $\Had$ for the Hadamard code with paramete
 
 So, given two local decoding algorithms for $\Had$ and $\RM$, we can construct our desired code. To convert our local correctors to local decoders, recall the notion of systematic encodings.
 
-\begin{definition}{3.x}
+\begin{definition}{2.4}
     A $[\ell, n]_2$  code with encoder $\Enc : \pmo^{n} \rightarrow \pmo^{\ell}$ is systematic if for every bit $i_{in} \in [n]$, there exists a bit $i_{out} \in [\ell]$ such that for any message $w \in \pmon$, 
     \begin{equation*}
         (\Enc(w))_{i_{out}} = w_{i_{in}}.
@@ -362,13 +355,13 @@ First, we claim that the standard encoder for the Hadamard code is systematic. R
 \end{equation*}
 In particular, in the index corresponding to $x = e_i$, the value of $\Enc_\Had(w)$ is just $\langle w, e_i \rangle = w_i$. Thus, this encoding is systematic, and we obtain a local decoder for $\Had$.
 
-\begin{claim}{3.x}
+\begin{claim}{2.4}
     The Hadamard code $\Had$ can be efficiently, systematically encoded, and locally decoded up to a relative distance of $\delta \leq \sfrac{1}{4}$ with $2$ queries.
 \end{claim}
 
 However, we have to be a bit more careful with the Reed-Muller code. The encoder we saw in class views the message as coefficients of a low degree polynomial, while the encoded word is the value of that polynomial on every input. To systematically encode the Reed-Muller code, we will need to view the message as a subset of these evaluation points, and transform these into a polynomial which takes the same values on these points. Before specifying exactly what we mean by this, let's recall our setup from the section above: our code $\RM$ was a Reed-Muller code $\RM_q(m, d)$, where $q = \log^3 n$, $m = \log n / \log \log n$, and $d = \log^2 n$. This code had dimension at least $n$, so that we can encode any $w \in \zo^n$ to a codeword $c \in \RM_q(m, d)$. To following claim gives a way to systematically encode $\RM$.
 
-\begin{claim}{3.x}
+\begin{claim}{2.5}
     Our Reed-Muller code $\RM$ can be efficiently systematically encoded.
 \end{claim}
 
@@ -400,7 +393,7 @@ However, we have to be a bit more careful with the Reed-Muller code. The encoder
 
 Note that in our analysis in Theorem 3.?, we could amplify the hardness of the any function $f$ to $1 - \delta$, where $\delta$ is the relative distance of the code $\cC$ at which we can locally decode it. However, since $\cC$ must be binary, $\delta \leq \sfrac{1}{2}$, and so local decoding can not get us to exponentially small correlation. To break past this barrier, we can use list decoding. 
 
-\begin{theorem}{3.x}
+\begin{theorem}{3.x}[Full hardness amplification, \cite{iw97}, \cite{STV99}]
     The average case hardness assumption implies the worst case hardness assumption.
 \end{theorem}
 
@@ -410,7 +403,7 @@ Note that in our analysis in Theorem 3.?, we could amplify the hardness of the a
 
 
 \begin{definition}{4.x}
-    Suppose that $\cF$ is a class of functions. We say that a probabilistic algorithm $\cA$ learns $\cF$ to accuracy $\gamma$ if, given query access to some $f \in \cF$, $\cA$ runs in $\poly(n)$ time and produces with probability $99\%$ a circuit $C$ such that 
+    Suppose that $\cF$ is a class of functions. We say that a probabilistic algorithm $\cA$ learns $\cF$ to accuracy $\gamma$ if, given query access to some $f \in \cF$, $\cA$ runs in $\poly(n)$ time and produces with probability $99\%$ a circuit $C$ such that wwbbb 
     \begin{equation*}
         \Corr(f, C) \geq \gamma.
     \end{equation*}
@@ -421,7 +414,7 @@ In this section, we will be interested in two types of learning: weak and strong
 
 \subsection{Boosting With XOR}
 
-\begin{theorem}{4.x}[Boosting with XOR \cite{BonehLipton}]
+\begin{theorem}{4.x}[Boosting with XOR, \cite{BonehLipton}]
     Suppose that $\cF$ is closed under \XOR{} and can be efficiently weakly learned. Then $\cF$ can be efficiently strongly learned.
 \end{theorem}
 
