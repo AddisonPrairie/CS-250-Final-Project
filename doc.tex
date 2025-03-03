@@ -544,10 +544,6 @@ To complete the proof, we need to deal with the fact that we don't know which bl
     For each $j \in [n^4]$, choose a random $\cS$ and construct the circuit $C_\cS^{(j)}$ using the process above. To test whether this circuit computes $f$ to an accuracy of $1 - \sfrac{1}{n}$, we can query $\poly(n)$ many examples $(x, f(x))$ and test whether it computes a roughly $1 - \sfrac{1}{n}$ fraction of them correctly. For any $j \in [n^4]$, if $j$ is the good block, this process will output a good circuit for $f$ with very high probability. Thus, since at least one block is good, repeating the process above for every block will output at least one circuit computing $f$ to accuracy $1 - \sfrac{1}{n}$ with high probability. Thus, we can strongly learn $\cF$.
 \end{proof}
 
-
-\subsection{Uniform Hardness Amplification and Boosting}
-
-
 \bibliographystyle{alpha}
 \bibliography{references}
 
