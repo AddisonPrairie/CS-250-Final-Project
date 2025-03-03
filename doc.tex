@@ -14,7 +14,7 @@
 
 \section{Introduction}
 
-\tableofcontents
+%\tableofcontents
 
 \section{Hardness Amplification with ECCs}
 
@@ -386,18 +386,76 @@ However, we have to be a bit more careful with the Reed-Muller code. The encoder
     \begin{equation*}
         \deg \left(\hat{f}_w\right) \leq m \cdot (|\bH| - 1) \leq \frac{\log n}{\log \log n} \cdot \left(\log n - 1\right) \leq \log^2 n = d.
     \end{equation*}
-    Thus, our encoding will map $w \in \zo^n$ to codewords $\hat{f}_w \in \RM$ systematically. Note also that this encoding is still efficient, since the polynomial $\hat{f}_w$ can be evaluated in at any $\beta \in \F_q^m$ in $\poly(m, q, d)$ time.
+    Thus, our encoding will map $w \in \zo^n$ to codewords $\hat{f}_w \in \RM$ systematically. Note also that this encoding is still efficient, since the polynomial $\hat{f}_w$ can be evaluated at any point $\beta \in \F_q^m$ in $\poly(m, q, d)$ time.
 \end{proof}
 
-\subsection{Worst Case Hardness to Average Case Hardness}
+\subsection{Worst to Average Case Hardness: Local List Decoding}
 
 Note that in our analysis in Theorem 3.?, we could amplify the hardness of the any function $f$ to $1 - \delta$, where $\delta$ is the relative distance of the code $\cC$ at which we can locally decode it. However, since $\cC$ must be binary, $\delta \leq \sfrac{1}{2}$, and so local decoding can not get us to exponentially small correlation. To break past this barrier, we can use list decoding. 
 
 \begin{theorem}{3.x}[Full hardness amplification, \cite{iw97}, \cite{STV99}]
-    The average case hardness assumption implies the worst case hardness assumption.
+    The worst case hardness assumption implies the average case hardness assumption.
 \end{theorem}
 
 
+\begin{theorem}{2.x}
+    The Reed-Muller Code $\RM_q(m, d)$ can be local list decoded up to a distance of $1 - \eps$ in time $\poly(q, m, d)$, where $\eps = c \cdot \sqrt{\sfrac{d}{q}}$ for some constant $c > 0$.
+\end{theorem}
+
+To construct a local list corrector for this code, we'll begin by slightly modifying the local corrector for the Reed-Muller code we've seen in class. Rather than drawing a random line about an input and running a Reed-Solomon unique decoder, we will run a Reed-Solomon list decoder. Suppose that $g : \F^m \rightarrow \F$ is a corrupted codeword such that $\delta(g, p) \leq 1 - \eps$ for some true codeword $p \in \F[X_1, \ldots, X_m]$. Then the algorithm runs as follows:
+\begin{enumerate}
+    \item[Input:] Evaluation point $x \in \F^m$ and advice $j \in \N$. 
+    \item[$\rightarrow$ 1:] Draw a random line $\ell$ passing through $x$.
+    \item[$\rightarrow$ 2:] Optain a list $h_1, \ldots, h_s$ of polynomials of degree at most $d$ such that $\delta(h_i, p |_\ell) \leq 1 - \eps$.
+    \item[$\rightarrow$ 3:] Output $h_j(x)$.
+\end{enumerate}
+For any $x \in \F^m$, with high probability over a random line $\ell$, the restriction $g|_\ell$ will be relatively close to $p|_\ell$, and so for some index $j \in [s]$ we will have $p|_\ell = h_j$ so that $h_j(x) = p(x)$. Does this mean that the algorithm works?
+Unfortunately, the answer is no. The most important issue is that for seperate $x_1, x_2 \in \F^m$, it will not necessarily be true that the same advice $j \in \N$ will work for both of these inputs. To get around this, we will start by showing that with high probability over the advice we give, a similar algorithm will succeed. To do so, rather than telling the corrector the index $j$, we will give it the evaluation of the polynomial $p$ at a random point $y$ on the line $\ell$. While this does not really solve the issue with our first algorithm, we're hoping that by showing our algorithm works with random advice, we can find a single piece of advice which works for almost all inputs. The algorithm now runs as follows:
+\begin{enumerate}
+    \item[Input:] Evaluation point $x \in \F^m$.
+    \item[$\rightarrow$ 1:] Draw a random line $\ell$ passing through $x$ and $y \backsim \ell$. Get as advice $(y, p(y))$.
+    \item[$\rightarrow$ 2:] Optain a list $h_1, \ldots, h_s$ of polynomials of degree at most $d$ such that $\delta(h_i, g |_\ell) \leq 1 - \eps$.
+    \item[$\rightarrow$ 3:] If there exists a unique $j$ such that $h_j(y) = p(y)$, output $h_j(x)$. Otherwise, output $\perp$.
+\end{enumerate}
+We claim that, with high probability over our choice of our point of advice $y$, the algorithm above outputs $p(x)$. Below, when we say that a line $\ell$ is ``good,'' we mean that $\delta(p|_\ell, g|_\ell) \leq 1 - \eps$.
+
+\begin{claim}{2.x}
+    If $\ell$ is ``good,'' then with high probability, the algorithm above outputs $p(x)$.
+\end{claim}
+\begin{proof}
+    Suppose that $h_1, \ldots, h_{s'} \in \F[X]$ are all polynomials of degree $\leq d$ such that $\delta(h_i, g|_\ell) \leq 1 - \eps$ and $p|_\ell \neq h_i$. Applying the Johnson bound to the Reed-Solomon code, there are at most $s' = O(\sqrt{\sfrac{|\F|}{d}})$ many of such polynomials. Furthermore, since low-degree polynomials can't have too much agreement, each $h_j$ agrees with $p|_\ell$ on at most $d$ points. Thus, we can bound the probability that, for a random $y \backsim \ell$, $p(y) = h(y)$ with the union bound:
+    \begin{equation*}
+        \Pr_{y \backsim \ell}[h_j(y) = p(y) \text{ for some $j$}] \leq \sum_{j = 1}^{s}\Pr_{y \backsim \ell}[h_j(y) = p(y)] \leq s' \cdot \frac{d}{|\F|} \leq O\left(\sqrt{\sfrac{d}{|\F|}}\right).
+    \end{equation*}
+    Note that the algorithm above succeeds when no other polynomial in the list equals $p|_\ell$ at the point $y$. Thus, the probability it succeeds is the probability that $h_j(y) \neq p(y)$ for all $j \in [s']$, which by our computation above is at most $O(\eps)$. Thus, the probability the algorithm above succeeds is at least $1 - O(\eps)$, which is very high.
+\end{proof}
+To derandomize our choice of advice, we will flip the order of the algorithm. Rather than sampling a random line $\ell$ then a random point $y \backsim \ell$, we will fix the point of advice $(y, p(y))$ ahead of time. Then for any $x \in \F^m$ for which this $y$ was ``good,'' we hope that the algorithm will still run correctly.
+\begin{enumerate}
+    \item[Input:] Evaluation point $x \in \F^m$, advice $(y, p(y))$ with $y \in \F^m$.
+    \item[$\rightarrow$ 1:] Optain a list $h_1, \ldots, h_s$ of polynomials of degree at most $d$ such that $\delta(h_i, g |_\ell) \leq 1 - \eps$.
+    \item[$\rightarrow$ 2:] If there exists a unique $j$ such that $h_j(y) = p(y)$, output $h_j(x)$. Otherwise, output $\perp$.
+\end{enumerate}
+
+To prove that this will be a good approximate local list corrector, we claim that there exists a piece of advice $(y, p(y))$ such that, for most $x \in \F^m$, the algorithm above outputs $p(x)$.
+
+\begin{claim}{2.x}
+    For any codeword $p \in \F[X_1, \ldots, X_m]$, there exists a $y \in \F^m$ such that the algorithm above when given $(y, p(y))$ as advice will output $p(x)$ for a $\sfrac{6}{7}$ fraction of all $x$'s.
+\end{claim}
+
+\begin{proof}
+    To prove this, we will prove that for a random point $y \backsim \F^m$, the algorithm will correctly compute all inputs on a random line $\ell$ through $y$ with high probability. To prove this, we say that a line is ``good'' if it satisfies the following properties:
+    \begin{enumerate}
+        \item[(1)] the relative distance between $g$ and $p$ on $\ell$ is at most $\delta(p|_\ell, g|_\ell) \leq 1 - \sfrac{\eps}{100}$.
+        \item[(2)] There does not exist a polynomial $h \in \F[X]$ of degree $\deg (h) \leq d$ such that $h \neq p|_\ell$, but $\delta(g|_\ell, h) \leq 1 - \sfrac{\eps}{100}$ and $h(y) = p|_\ell(y)$.
+    \end{enumerate}
+    Note that if $\ell$ is good, the algorithm above will output the correct answer $p(x)$ on any $x \in \ell$. Thus, we just need to show that with high probability, a randomly chosen $y$ and $\ell$ will be ``good.'' Proving that property (1) holds with high probability is similar to the proof in the analysis of the local corrector for the Reed-Muller code; since
+    \begin{equation*}
+        \E_{y, \ell}[\delta(p|_\ell, g|_\ell)] = 1 - \eps,
+    \end{equation*}
+    given a random $y$ and $\ell$, the probability that property (1) holds is $1 - \sfrac{1}{100} = .99$. The proof that property (2) holds is similar to our proof of Claim 2.x; for a fixed $x$, random $\ell$ and random $y$, we showed such a polynomial $h$ does not exist with probability $1 - O(\eps)$. As $\eps \rightarrow 0$, we can say that this occurs with probability at least $.99$ as well. Thus, applying the union bound, a random $y \backsim \F^m$ and line $\ell$ will satisfy be good with probability $.98$, and so we can find a fixed point $y \in \F^m$ such that a random line $\ell$ through $y$ will be good with probability $.98$. If we give this $y$ as advice to our algorithm, it will compute $p(x)$ correctly for $98$\% of $x \in \F^m$. 
+\end{proof}
+
+The final step in proving Theorem 2.x is to convert the algorithm above, which outputs the correct answer on $98$\% of inputs, to one which outputs the correct answer with high probability on all inputs. While this might seem like a big issue, we've actually already seen how to do this: locally correcting the Reed-Muller code. More precisely, suppose we receive a corrupted codeword $g : \F^m \rightarrow \F$ such that $\delta(g, p) \leq 1 - \eps$. Given the advice $(y, p(y))$, our algorithm above produces a corrupted $\tilde{p} : \F^m \rightarrow p$, such that $\delta(p, \tilde{p}) \leq .02$. Using our local corrector for the Reed-Muller code, simulating queries to $\tilde{p}$ with calls to our algorithm above, we can recover with high probability any particular bit of $p$. Thus, we can locally list correct the Reed-Muller code. Since we've also proven that we can systematically encode the Reed-Muller code, we can locally list decode this code as well. This completes the proof of Theorem 2.x.
 
 \section{Boosting and Uniform Hardness Amplification}
 
