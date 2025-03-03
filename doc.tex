@@ -391,16 +391,31 @@ However, we have to be a bit more careful with the Reed-Muller code. The encoder
 
 \subsection{Worst to Average Case Hardness: Local List Decoding}
 
-Note that in our analysis in Theorem 3.?, we could amplify the hardness of the any function $f$ to $1 - \delta$, where $\delta$ is the relative distance of the code $\cC$ at which we can locally decode it. However, since $\cC$ must be binary, $\delta \leq \sfrac{1}{2}$, and so local decoding can not get us to exponentially small correlation. To break past this barrier, we can use list decoding. 
+In our proof of \hyperref[t-2-6]{Theorem 2.6}, we could amplify the hardness of a worst-case hard $f$ to $1 - \delta$, where our code $\cC$ was locally decodable up to a distance of $\sfrac{\delta}{2}$. However, since our code $\cC$ must be binary, we could not possibly local decode it past a distance of $\sfrac{1}{4}$, and thus we cannot get to exponentially small correlation. To break through this barrier, \cite{STV99} used a technique we've seen in class to decode much closer to the true distance of the code: local list decoding.
 
 \begin{theorem}{3.x}[Full hardness amplification, \cite{iw97}, \cite{STV99}]
     The worst case hardness assumption implies the average case hardness assumption.
 \end{theorem}
 
+To prove this, we use a similar strategy as above, replacing unique local decoding with local list decoding; our choice of $m, q, d$ will be slightly different, the analysis is essentially the same. Then proving Theorem 3.x reduces to finding local list decoders for both the Hadamard code and the Reed-Muller code. We already saw in class that the Hadamard code can be local list decoded efficiently:
+
+\begin{theorem}{2.x}
+    The Hadamard Code $\Had_k$ can be local list decoded up to a distance of $\sfrac{1}{2} - \eps$ in time $\poly(k, \sfrac{1}{\eps})$.
+\end{theorem}
+
+The remainder of this section will walk through a proof that the Reed-Muller code can be locally list decoded up to an appropriate distance. We will prove the following theorem.
 
 \begin{theorem}{2.x}
     The Reed-Muller Code $\RM_q(m, d)$ can be local list decoded up to a distance of $1 - \eps$ in time $\poly(q, m, d)$, where $\eps = c \cdot \sqrt{\sfrac{d}{q}}$ for some constant $c > 0$.
 \end{theorem}
+
+In this section, we will use the following definition of local list decoding:
+
+\begin{definition}{2.x}
+    Suppose that $\cC$ is a $[m, n]_2$ code with encoding map $\Enc : \pmo^{n} \rightarrow \pmon$. We say that $\cC$ is $(\delta, \ell)$-locally list decodable if there exists a random algorithm $\cA$ over inputs $(i, a)$, where $i \in [n]$, $a \in \pmo^{\log \ell}$, so that for any $w \in \pmo^m$, for every $c \in \cC$ such that $\delta(c, w) \leq \delta$, there exists an advice string $a_c \in \pmo^{\log \ell}$ such that $\cA$ will locally decode $w$ to $c$ given the input $a_c$.
+\end{definition}
+
+Here, rather than view a local list decoder as a collection of algorithms, we have viewed it as a single algorithm which takes an addition piece of input as ``advice.'' This definition is equivalent to the one used in class, but will be a bit easier to work with throughout the proof.
 
 To construct a local list corrector for this code, we'll begin by slightly modifying the local corrector for the Reed-Muller code we've seen in class. Rather than drawing a random line about an input and running a Reed-Solomon unique decoder, we will run a Reed-Solomon list decoder. Suppose that $g : \F^m \rightarrow \F$ is a corrupted codeword such that $\delta(g, p) \leq 1 - \eps$ for some true codeword $p \in \F[X_1, \ldots, X_m]$. Then the algorithm runs as follows:
 \begin{enumerate}
