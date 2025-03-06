@@ -14,37 +14,47 @@
 
 \section{Introduction}
 
+The purpose of this paper is to discuss the connection between three different topics in theoretical computer science: error correcting codes, hardness amplification,
+
 %\tableofcontents
 
 \section{Hardness Amplification with ECCs}
 
-\begin{assumption}{1} \label{a-1}
+This section will discuss the connection between error correcting codes and hardness amplification. In particular, we'd like to understand the relationship between three different assumptions, which we'll list below. The first is the worst case hardness assumption, which says that there exists a function computable in exponential time which can't be computed \emph{exactly} by circuits of a certain size: any small circuit attempting to compute $f$ must mess up on at least 1 input.
+
+\begin{assumption}{1}[Worst Case Hardness] \label{a-1}
     There exists a function $f : \pmon \rightarrow \pmo$ such that $f$ can be computed in time $2^{O(n)}$, but there exists some $\delta > 0$ such that 
     \begin{equation*}
         \Corr\left(f, 2^{\delta n}\right) < 1.
     \end{equation*}
 \end{assumption}
 
-\begin{assumption}{2} \label{a-2}
+Mild Hardness strengthens this slightly: instead of asking that any small circuit attempting to compute $f$ messes up on at least 1 input, we could ask that it messes up on a constant fraction of inputs.
+
+\begin{assumption}{2}[Mild Hardness] \label{a-2}
     There exists a function $f : \pmon \rightarrow \pmo$ such that $f$ can be computed in time $2^{O(n)}$, but there exists some $\delta > 0$ such that 
     \begin{equation*}
         \Corr\left(f, 2^{\delta n}\right) < .9.
     \end{equation*}
 \end{assumption}
 
-\begin{assumption}{3} \label{a-3}
+Finally, average case hardness strengthens both of the above by a large margin, requiring that any small circuit attempting to compute $f$ cannot get better than exponentially small correlation.
+
+\begin{assumption}{3}[Average Case Hardness] \label{a-3}
     There exists a function $f : \pmon \rightarrow \pmo$ such that $f$ can be computed in time $2^{O(n)}$, but there exists some $\delta > 0$ such that 
     \begin{equation*}
         \Corr\left(f, 2^{\delta n}\right) < 2^{-\Omega(n)}.
     \end{equation*}
 \end{assumption}
 
-
-
+To see just how strong of an assumption this is, consider that given any function $f$, the algorithm which just randomly guesses the value of $f$ on any input gets correlation $0$ with $f$. Thus, Assumption 3 supposes that an explicit function exists which even exponentially large circuits cannot solve much better than random guessing. As we will see in section 2.1, such a function is very useful in constructing strong pseudorandom generators. Thus, while we'd like to find functions which are average case hard, it seems much more difficult to directly prove that such functions exists; while we already struggle to prove worst case lower bounds, the task of proving average case lower bounds is even harder. To ease this burden, we'd like to prove that we can convert a worst case hard function to an average case hard function, meaning we only need to prove Assumption 1 to prove Assumption 3.
 
 \begin{theorem}{2.1}[\cite{iw97}, \cite{STV99}]\label{t-2-1}
     If there exists a function $f$ satisfying the worst case hardness assumption, there exists a function $f'$ satisfying the average case hardness assumption.
 \end{theorem}
+
+Before proving this, we will first discuss in more detail why hardness amplification is useful.
+
 
 \subsection{Why Hardness Amplification?}
 
@@ -247,8 +257,10 @@ While we will not go through the analysis here, one can prove \hyperref[l-2-2]{L
 
 \subsection{Worst Case Hardness to Mild Hardness}
 
+Before proving that worst case hardness implies average case hardness (\hyperref[t-2-1]{Theorem 2.1}), we will show that a worst case hard function can be transformed into a mildly hard function. To see the connection between codes and hardness amplification, we will start by proving that, given a code with particular properties, we can amplify hardness. The properties we need are similar to things we've already seen in class: we'll need a code which is efficiently encodable and locally decodable. 
+
 \begin{theorem}{2.6}\label{t-2-6}
-    Suppose that $\cC$ is a $[m^2, m]_2$ code with the following properties: (1) the encoding map $\Enc : \pmo^m \rightarrow \pmo^{m^2}$ is computable in $\poly(m)$ time, (2) there exists a local decoding algorithm $\LDec$ which can correct up to a relative distance of $.05$ running in $\polylog(m)$ time. Then the worst case hardness assumption implies the mild hardness assumption.
+    Suppose that $\cC$ is a $[m^2, m]_2$ code with the following properties: (1) the encoding map $\Enc : \pmo^m \rightarrow \pmo^{m^2}$ is computable in $\poly(m)$ time, and (2) there exists a local decoding algorithm $\LDec$ which can correct up to a relative distance of $.05$ running in $\polylog(m)$ time. Then the worst case hardness assumption implies the mild hardness assumption.
 \end{theorem}
 
 \begin{proof}
@@ -331,14 +343,12 @@ Fixing $k = \log |\F|$, we will write $\Had$ for the Hadamard code with paramete
 \begin{proof}
     Let's begin by verifying the parameters of the code. The dimension will still by $n$. To compute the block length, see that every symbol of a codeword $c \in \RM$ is encoded to a Hadamard codeword of length $2^{\log |\F|} = |\F| = \log^3 n$, so that the total length of the resulting word is $n^3 \log^3 n$. Thus, $\cC$ is indeed a $[n^3 \log^3 n, n]_2$ code.
 
-    Next, we claim that $\cC$ can be locally decoded in time $\polylog(n)$ up to a distance of $\sfrac{1}{28}$. Suppose that $c \in \cC$ and $\tilde{c}$ is a corrupted codeword such that $\delta(c, \tilde{c}) \leq \sfrac{1}{28}$. The algorithm for locally recovering $c$ from $\tilde{c}$ runs as follows. Run the local decoder $\LDec_\RM$ on the Reed-Muller code word represented by $\tilde{c}$, replacing each query to this code word with a call to the local decoder $\LDec_\Had$ with query access to $\tilde{c}$. The proof that this correctly locally decodes up to the required distance is similar to the proof of decoding concatenated codes we saw in class.
-    
-    Note that this will still run in time poly-logarithmic in $n$. Furthermore, we can boost the success probability of each decoder by repetition by sacrificing only a small increase in run time, and thus the process above can be made to succeed with probability $\sfrac{2}{3}$. Thus, $\cC$ can be locally decoded in $\polylog(n)$ time.
+    To see why $\cC$ can be locally decoded in time $\polylog(n)$ up to a distance of $\sfrac{1}{28}$, we can use the naive strategy for decoding concatenated codes: run the local decoder for the Reed-Muller code, replacing each query to a given symbol with a query to the local decoder for the Hadamard code. The proof that this works correctly is similar to the proof of decoding concatenated codes we saw in class. Together, this is still run in $\polylog(n)$ time. Thus, $\cC$ can be locally decoded in $\polylog(n)$ time.
 \end{proof}
 
 So, given two local decoding algorithms for $\Had$ and $\RM$, we can construct our desired code. To convert our local correctors to local decoders, recall the notion of systematic encodings.
 
-\begin{definition}{2.4}
+\begin{definition}{2.4}[Systematic Encodings]
     A $[\ell, n]_2$  code with encoder $\Enc : \pmo^{n} \rightarrow \pmo^{\ell}$ is systematic if for every bit $i_{in} \in [n]$, there exists a bit $i_{out} \in [\ell]$ such that for any message $w \in \pmon$, 
     \begin{equation*}
         (\Enc(w))_{i_{out}} = w_{i_{in}}.
@@ -393,25 +403,25 @@ However, we have to be a bit more careful with the Reed-Muller code. The encoder
 
 In our proof of \hyperref[t-2-6]{Theorem 2.6}, we could amplify the hardness of a worst-case hard $f$ to $1 - \delta$, where our code $\cC$ was locally decodable up to a distance of $\sfrac{\delta}{2}$. However, since our code $\cC$ must be binary, we could not possibly local decode it past a distance of $\sfrac{1}{4}$, and thus we cannot get to exponentially small correlation. To break through this barrier, \cite{STV99} used a technique we've seen in class to decode much closer to the true distance of the code: local list decoding.
 
-\begin{theorem}{3.x}[Full hardness amplification, \cite{iw97}, \cite{STV99}]
+\begin{theorem}{2.7}[Full hardness amplification, \cite{iw97}, \cite{STV99}]\label{t-2-7}
     The worst case hardness assumption implies the average case hardness assumption.
 \end{theorem}
 
-To prove this, we use a similar strategy as above, replacing unique local decoding with local list decoding; our choice of $m, q, d$ will be slightly different, the analysis is essentially the same. Then proving Theorem 3.x reduces to finding local list decoders for both the Hadamard code and the Reed-Muller code. We already saw in class that the Hadamard code can be local list decoded efficiently:
+To prove this, we use a similar strategy as above, replacing unique local decoding with local list decoding; our choice of $m, q, d$ will be slightly different, the analysis is essentially the same. Then proving \hyperref[t-2-7]{Theorem 2.7} reduces to finding local list decoders for both the Hadamard code and the Reed-Muller code. We already saw in class that the Hadamard code can be local list decoded efficiently:
 
-\begin{theorem}{2.x}
+\begin{theorem}{2.8}[The Goldreich-Levin Theorem, \cite{goldreichlevin}] \label{t-2-8}
     The Hadamard Code $\Had_k$ can be local list decoded up to a distance of $\sfrac{1}{2} - \eps$ in time $\poly(k, \sfrac{1}{\eps})$.
 \end{theorem}
 
 The remainder of this section will walk through a proof that the Reed-Muller code can be locally list decoded up to an appropriate distance. We will prove the following theorem.
 
-\begin{theorem}{2.x}
+\begin{theorem}{2.9} \label{t-2-9}
     The Reed-Muller Code $\RM_q(m, d)$ can be local list decoded up to a distance of $1 - \eps$ in time $\poly(q, m, d)$, where $\eps = c \cdot \sqrt{\sfrac{d}{q}}$ for some constant $c > 0$.
 \end{theorem}
 
 In this section, we will use the following definition of local list decoding:
 
-\begin{definition}{2.x}
+\begin{definition}{2.5}[Local List Decoding]
     Suppose that $\cC$ is a $[m, n]_2$ code with encoding map $\Enc : \pmo^{n} \rightarrow \pmon$. We say that $\cC$ is $(\delta, \ell)$-locally list decodable if there exists a random algorithm $\cA$ over inputs $(i, a)$, where $i \in [n]$, $a \in \pmo^{\log \ell}$, so that for any $w \in \pmo^m$, for every $c \in \cC$ such that $\delta(c, w) \leq \delta$, there exists an advice string $a_c \in \pmo^{\log \ell}$ such that $\cA$ will locally decode $w$ to $c$ given the input $a_c$.
 \end{definition}
 
@@ -434,7 +444,7 @@ Unfortunately, the answer is no. The most important issue is that for seperate $
 \end{enumerate}
 We claim that, with high probability over our choice of our point of advice $y$, the algorithm above outputs $p(x)$. Below, when we say that a line $\ell$ is ``good,'' we mean that $\delta(p|_\ell, g|_\ell) \leq 1 - \eps$.
 
-\begin{claim}{2.x}
+\begin{claim}{2.6}
     If $\ell$ is ``good,'' then with high probability, the algorithm above outputs $p(x)$.
 \end{claim}
 \begin{proof}
@@ -453,7 +463,7 @@ To derandomize our choice of advice, we will flip the order of the algorithm. Ra
 
 To prove that this will be a good approximate local list corrector, we claim that there exists a piece of advice $(y, p(y))$ such that, for most $x \in \F^m$, the algorithm above outputs $p(x)$.
 
-\begin{claim}{2.x}
+\begin{claim}{2.7}
     For any codeword $p \in \F[X_1, \ldots, X_m]$, there exists a $y \in \F^m$ such that the algorithm above when given $(y, p(y))$ as advice will output $p(x)$ for a $\sfrac{6}{7}$ fraction of all $x$'s.
 \end{claim}
 
