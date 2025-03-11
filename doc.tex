@@ -14,7 +14,35 @@
 
 \section{Introduction}
 
-The purpose of this paper is to discuss the connection between three different topics in theoretical computer science: error correcting codes, hardness amplification,
+The purpose of this report is to discuss the connection between three different topics in theoretical computer science. The first are error correcting codes, the subject of this course. The second is hardness amplification, a technique with applications in cryptography and psuedorandomness; the purpose of hardness amplification is to convert some explicit $f : \pmon \rightarrow \pmo$ which cannot be computed \emph{exactly} by reasonably sized circuits into another explicit function $\hat{f} : \pmon \rightarrow \pmo$ which cannot be computed \emph{approximately} by reasonably sized circuits (such an $\hat{f}$ is called \emph{average case hard}). Explicit average case hard functions are useful for constructing secure cryptosystems and in derandomization, but it seems much more difficult to directly prove that a function is average case hard than to prove that it is worst case hard (i.e., cannot be computed exactly). Thus, having a generic way to ``amplify'' hardness gets us one step closer to constructing explicit average case hard functions. The last of the three is boosting, a technique in machine learning which converts \emph{weak} learning algorithms (i.e., those which output a hypothesis with accuracy only 51\%) to \emph{strong} learning algorithms (i.e., those which output a hypothesis with accuracy 99\%).
+
+Section 2 will discuss the connection between hardness amplification and error correcting codes, giving a longer explanation about why average case hard functions are useful for derandomization and demonstrating how error correcting codes can be used to amplify hardness. Section 3 will describe boosting in more detail, and discuss the connection between hardness amplification and boosting.
+
+\subsection{Background}
+
+Throughout this report, we will view bits as in $\{\pm 1\}$ rather than $\zo$. We will denote by $U_n$ the uniform distribution over $\pmon$. We will also need the following definition and fact.
+
+\begin{definition}{1.1}[Correlation/Advantage] 
+    The \emph{corrolation} between two functions $f, g : \pmon \rightarrow \pmo$, written $\Corr(f, g)$, is the probability that they are equal, centered about $\sfrac{1}{2}$, 
+    \begin{equation*}
+        \Corr(f, g) := 2 \left(\Pr_{x \in U_n}[f(x) = g(x)] - \sfrac{1}{2}\right).
+    \end{equation*} 
+    If $S$ represents a circuit size, the correlation between $f$ and $S$ is the maximum correlation a circuit $C$ of size $\leq S$ can achieve with $f$, 
+    \begin{equation*}
+        \Corr(f, S) := \max_{|C| \leq S} \left\{\Corr(f, C)\right\}.
+    \end{equation*}
+\end{definition}
+
+\begin{fact}{1.1}
+    If $f, g : \pmon \rightarrow \pmo$ are functions, then 
+    \begin{equation*}
+        \Corr(f, g) = \E_{x \backsim U_n} [f(x) \cdot g(x)].
+    \end{equation*}
+\end{fact}
+
+\begin{definition}{1.2}
+    For a function $f : \pmon \rightarrow \pmo$, we denote by $\TT(f) \in \pmo^{2^n}$ the truth table of $f$. That is, the $i$-th bit of $\TT(f)$ is $f(x_i)$, where $x_i \in \pmon$ is the $i$-th string in some ordering of $\pmon$ (say, by binary representation).
+\end{definition}
 
 %\tableofcontents
 
@@ -47,7 +75,7 @@ Finally, average case hardness strengthens both of the above by a large margin, 
     \end{equation*}
 \end{assumption}
 
-To see just how strong of an assumption this is, consider that for any $f$, the algorithm which just randomly guesses the output achieves correlation $0$ with $f$; thus, \hyperref[a-3]{Assumption 3} supposes that an explicit function exists which even exponentially large circuits cannot compute much better than random guess. Clearly, \hyperref[a-3]{Assumption 3} implies \hyperref[a-2]{Assumption 2}, and \hyperref[a-2]{Assumption 2} implies \hyperref[a-1]{Assumption 1}; but can we go in the opposite direction? Given a function which large circuits cannot compute exactly, can we construct a function which large circuits cannot compute much better than random guessing? Surprisingly, the answer is yes.
+To see just how strong of an assumption this is, consider that for any $f$, the algorithm which just randomly guesses the output achieves correlation $0$ with $f$; thus, \hyperref[a-3]{Assumption 3} supposes that an explicit function exists which even exponentially large circuits cannot compute much better than random guessing. Clearly, \hyperref[a-3]{Assumption 3} implies \hyperref[a-2]{Assumption 2}, and \hyperref[a-2]{Assumption 2} implies \hyperref[a-1]{Assumption 1}; but can we go in the opposite direction? Given a function which large circuits cannot compute exactly, can we construct a function which large circuits cannot compute much better than random guessing? Surprisingly, the answer is yes.
 
 \begin{theorem}{2.1}[\cite{iw97}, \cite{STV99}]\label{t-2-1}
     If there exists a function $f$ satisfying the worst case hardness assumption, there exists a function $f'$ satisfying the average case hardness assumption.
@@ -80,7 +108,7 @@ Given that it is unknown whether $\P = \BPP$, it should be clear that we don't k
     Given the average case hardness assumption (\hyperref[a-3]{Assumption 3}), there exists a $(O(\log n), n)$-PRG.
 \end{theorem}
 
-Thus, given an average case hard function we can construct a good psuedorandom generator, and given this good psuedorandom generator we can efficiently derandomize $\BPP$. This gives us a promising new avenue to generically derandomize algorithms; however, it seems extremely difficult to prove that a function is average case hard. We can reduce this burden by amplifying hardness, meaning we only need to prove worst case hardness for a particular function to construct good PRGs. In other words, taking some function which is computable in exponential time and is believed to be hard (i.e., $\SAT{}$), we can combine Theorems \hyperref[t-2-1]{2.1}, \hyperref[t-2-2]{2.2}, and \hyperref[t-2-3]{2.3} to show that proving worst case lower bounds suffices to derandomize $\BPP{}$.
+Thus, given an average case hard function we can construct a good psuedorandom generator, and given this good psuedorandom generator we can efficiently derandomize $\BPP$. This gives us a promising new avenue to generically derandomize algorithms; however, it seems extremely difficult to prove directly that a function is average case hard. We can reduce this burden by amplifying hardness, meaning we only need to prove worst case hardness for a particular function to construct good PRGs. In other words, taking some function which is computable in exponential time and is believed to be hard (e.g., $\SAT{}$), we can combine Theorems \hyperref[t-2-1]{2.1}, \hyperref[t-2-2]{2.2}, and \hyperref[t-2-3]{2.3} to show that proving worst case lower bounds suffices to derandomize $\BPP{}$.
 
 \begin{corollary}{2.1}
     If there exists some $\delta > 0$ such that \SAT{} requires circuits of size $\Omega(2^{\delta n})$, then $\P = \BPP$.
@@ -142,6 +170,7 @@ The generator works by having \emph{every} bit of the output compute the hardcor
 \begin{equation*}
     (G_\cS(s))_{i} = f(s_{j_1}, \ldots, s_{j_{\sfrac{2}{\delta} \cdot \log n}}), \quad \left\{j_1, \ldots, j_{\sfrac{2}{\delta} \cdot \log n}\right\} = S_i.
 \end{equation*}
+\iffalse
 As a picture, our psuedorandom generator $G_\cS$ looks something like this.
 \begin{center}
     \begin{tikzpicture}[align=center,node distance=4cm, scale=1.5]
@@ -218,6 +247,7 @@ As a picture, our psuedorandom generator $G_\cS$ looks something like this.
     \end{tikzpicture}
 \end{center}
 \noindent
+\fi
 The key to creating a good psuedorandom generator is picking a good collection of subsets $\cS$, and to do that, we need to explain what we mean by ``roughly disjoint'' subsets. The reason why we can't just take any collection of subsets is that, if two distinct subsets $S_i$ and $S_j$ overlap too much, then the $i$-th and $j$-th bits of $G_\cS$ will be very correlated, preventing us from using Yao's next bit prediction lemma in our analysis. On the other hand, if we wanted to make each subset truly disjoint, the seed length of our PRG $G_\cS$ would be at least $\sfrac{2}{\delta} \cdot n \cdot \log n = O(n \log n)$, making this a terrible PRG.
 
 Thus, we need to choose $\cS$ to balance between these two extremes: we need some overlap so that the seed length is small, but not too much that different bits in the output are very correlated. As it turns out, the following requirements will suffice for $G_\cS$ to be a good PRG:
@@ -464,25 +494,82 @@ The final step in proving Theorem 2.x is to convert the algorithm above, which o
 \section{Boosting and Uniform Hardness Amplification}
 
 
-\begin{definition}{4.x}
-    Suppose that $\cF$ is a class of functions. We say that a probabilistic algorithm $\cA$ learns $\cF$ to accuracy $\gamma$ if, given query access to some $f \in \cF$, $\cA$ runs in $\poly(n)$ time and produces with probability $99\%$ a circuit $C$ such that wwbbb 
+In this section, we will define the type of boosting we will be interested in and discuss it's connection to hardness amplification.
+
+\begin{definition}{3,1}
+    Suppose that $\cF$ is a class of functions. We say that a probabilistic algorithm $\cA$ learns $\cF$ to accuracy $\gamma$ if, given query access to some $f \in \cF$, $\cA$ runs in $\poly(n)$ time and produces with probability $99\%$ a circuit $C$ such that 
     \begin{equation*}
         \Corr(f, C) \geq \gamma.
     \end{equation*}
 \end{definition}
+We will be interested in two types of learning: weak and strong learning. We say that an algorithm $\cA$ \emph{strongly learns} a class $\cF$ if is learns the class to an accuracy of $1 - \sfrac{1}{n}$, while we say that it \emph{weakly learns} a class $\cF$ if it learns the class to an accuracy of $\sfrac{1}{n}$. In other words, a strong learner outputs a circuit whose correlation with the target function becomes arbitrarily close to $1$, while a weak learner outputs a circuit which does only slightly better than random guessing.
 
-In this section, we will be interested in two types of learning: weak and strong learning. We say that an algorithm $\cA$ \emph{strongly learns} a class $\cF$ if is learns the class to an accuracy of $1 - \sfrac{1}{n}$, while we say that it \emph{weakly learns} a class $\cF$ if it learns the class to an accuracy of $\sfrac{1}{n}$. In other words, a strong learner outputs a circuit whose correlation with the target function becomes arbitrarily close to $1$, while a weak learner outputs a circuit which does only slightly better than random guessing.
+Our goal is to design a boosting algorithm which, given query access to a weak learner $\cA$, can efficiently strongly learn a given class of functions. In particular, the algorithms we discuss in this section will query the weak learner only once; notably, this is different from the typical setting for boosting.\footnote{Typically, a boosting algorithm converts a weak learning algorithm $\cA$ which can learn over \emph{any} distribution into a strong learning algorithm over the uniform distribution. Such an algorithm works by repeatedly querying the weak learning algorithm to incrementally update their ``strong'' hypothesis, calling the weak learner on distributions where their hypothesis performs the worst.} More concretely, suppose that $f \in \cF$ is the function we are trying to learn. Our boosting algorithm will construct a modified function $\hat{f}$ which can be efficiently computed by querying $f$, and ask $\cA$ to produce a weak circuit $C$ getting correlation $\Corr(\hat{f}, C) \geq \sfrac{1}{n}$ with $\hat{f}$. Next, it will somehow convert this into a circuit $C'$ strongly computing $\Corr(f, C') \geq 1 - \sfrac{1}{n}$. In order for this to work, we'll need the function $\hat{f}$ to actually be in the class $\cF$. The way we will guarantee this is through the following definition.
 
+\begin{definition}{3.2}
+    We say that a class of functions $\cF$ is closed under $g : \pmo^k \rightarrow \pmo$ if, for any $f \in \cF$, the function $g \diamond f : \pmo^{n \cdot k} \rightarrow \pmo$ is also in $\cF$, where this function is defined as
+    \begin{equation*}
+        (g \diamond f)(x_1, \ldots, x_k) = g(f(x_1), \ldots, f(x_k)).
+    \end{equation*}
+    Here, $k$ should be viewed as a function of $n$.
+\end{definition}
 
-\subsection{Boosting With XOR}
+Now, the choice of $g$ (i.e., the choice of $\hat{f}$) becomes the core of the boosting algorithm, with different functions yielding different trade offs. If $g$ is too complex, $g \diamond f$ may not be in the class $\cF$, but if $g$ is too simple, we might not be able to convert a circuit weakly computing $g \diamond f$ to one strongly computing $f$. To keep things concrete, we will fix $\cF$ to be the class of functions which are computable by a polynomial sized circuit for the remainder of this section. While there are many reasonable choices for $g$, we will have it be the XOR function. 
 
-\begin{theorem}{4.x}[Boosting with XOR, \cite{BonehLipton}]
-    Suppose that $\cF$ is closed under \XOR{} and can be efficiently weakly learned. Then $\cF$ can be efficiently strongly learned.
+\begin{definition}{3.3}
+    For a function $f : \pmon \rightarrow \pmo$, we denote by $f^{\oplus k} : \pmo^{n \cdot k} \rightarrow \pmo$ by 
+    \begin{equation*}
+        f^{\oplus k}(x_1, \ldots, x_k) = \prod_{i = 1}^{k} f(x_i).
+    \end{equation*}
+\end{definition}
+
+We will say that $\cF$ is closed under $k-\XOR$ if $f^{\oplus k} \in \cF$ for every $f \in \cF$. Since we've fixed $\cF$ to be the set of functions computable by polynomial size circuits, $\cF$ is closed under $p(n)-\XOR$ for any polynomial $p(n)$. Boneh and Lipton \cite{BonehLipton} constructed a boosting algorithm which works under a similar assumption.
+
+\begin{theorem}{3.1}[Boosting with XOR, \cite{BonehLipton}]\label{t-3-1}
+    Suppose that $\cF$ is closed under $n^4-\XOR$ and can be efficiently weakly learned. Then $\cF$ can be efficiently strongly learned.
 \end{theorem}
 
-To get an idea of how the proof works, we make the following remark.
+Their boosting algorithm runs as follows: in order to strongly learn $f$, run the weak learning algorithm $\cA$ on $f^{\oplus n^4}$, simulating any queries to $f^{\oplus n^4}$ by querying $f$ and XOR-ing the result. This produces a circuit $C$ such that $\Corr(f^{\oplus n^4}, C) \geq \sfrac{1}{n}$. From this, it constructs a list of circuits $C_1', \ldots, C_{n^4}'$, at least one of which strongly computes $f$. By testing the performance of each using queries to $f$, the algorithm can output the strongest among the list with high probability.
 
-\begin{remark}{4.x}
+So what does this have to do with hardness amplification? In both settings, we begin with a circuit approximately computing $\hat{f}$ and use it to construct a circuit computing the original $f$ exactly (or almost exactly). This gives us an intuition for why this sort of boosting works: by learning a weak hypothesis for a ``harder'' version of $f$ (i.e., $f^{\oplus n^4}$), we hope that this contains enough information about $f$ to construct a circuit strongly computing $f$. 
+
+In sum, our strategy for hardness amplification (i.e., a proof by contradiction) and this version of boosting are essentially identical, so that better boosting algorithms can yield stronger hardness amplification and vice versa. Moreover, we've already seen that error correcting codes are a useful tool for amplifying hardness, and we hope that they could also be used in developing boosting algorithms.
+
+
+\bibliographystyle{alpha}
+\bibliography{references}
+
+\section*{Appendix}
+
+\subsection*{Proof of \hyperref[t-2-2]{Theorem 2.2}}
+
+\begin{proof}[Proof \textup{(of \hyperref[t-2-2]{Theorem 2.2})}] 
+    Suppose that $f \in \BPP$, so that there exists a polynomial time algorithm $\cA$ probabilistically computing $f$ using $r = \poly(n)$ random bits. When computing $f$ on $x \in \pmon$, we will view $\cA$ as taking two inputs: the string $x$, and a string of random bits $u \in \pmo^{r}$. The fact that $\cA$ probabilistically computes $f$ means that for every $x \in \pmon$, 
+    \begin{equation*}
+        \Pr_{u \backsim U_r}[\cA(x, u) = f(x)] \geq \sfrac{2}{3}. 
+    \end{equation*}
+    We can convert this to a $\poly(n)$ sized circuit $C$ computing the same function. For any $x \in \pmon$, we will write $C^x$ to denote the circuit which fixes the first $n$ inputs of $C$ to that particular string.
+    \begin{equation*}
+        \Pr_{u \backsim U_r}[C^{x}(u) = f(x)] \geq \sfrac{2}{3}. 
+    \end{equation*}
+    Write $m = |C|$, suppose that $G$ is an $(O(\log m), m)$-PRG computable in $\poly(m)$ time. Then 
+    \begin{equation*}
+        \Pr_{s \backsim U_{O(\log n)}}[C^{x}(G(s)) = f(x)] \geq \sfrac{2}{3} - \sfrac{1}{10} \geq .55.
+    \end{equation*}
+    Since $C$ and $\cA$ compute the same function, 
+    \begin{equation*}
+        \Pr_{s \backsim U_{O(\log n)}}[\cA(x, s) = f(x)] \geq  .55. \tag{1}
+    \end{equation*}
+    Now consider the following deterministic polynomial time algorithm $\cA'$ for computing $f$: on input $x \in \pmon$, iterate over all seed $s \in \pmo^{O(\log n)}$, computing $\cA(x, s)$; then, output whichever bit appears more among these computations. $\cA'$ requires running $G$ and $\cA$ for every string in $\pmo^{O(\log m)}$. Since $m = \poly(n)$, the total running time of $\cA'$ is 
+    \begin{equation*}
+        \left|\pmo^{O(\log n)}\right| \cdot \poly(m) \cdot \poly(n) = 2^{O(\log n)} \cdot \poly(n) = \poly(n).
+    \end{equation*}
+    Moreover, by the guarantee of equation (1), the bit which appears more often among these computations will be the value of $f$. Thus, $\cA'$ is a deterministic polynomial time algorithm computing $f$, so that $f \in \P$.
+\end{proof}
+
+\subsection*{Proof of \hyperref[t-3-1]{Theorem 3.1}}
+
+\begin{remark}{A.1}\label{r-a-1}
     Fix a small $\eps, \delta > 0$. Suppose that $c$ is a coin which is biased in an unknown direction: the probability it heads is either $\sfrac{1}{2} + \eps$ or $\sfrac{1}{2} - \eps$, but we're unsure which. If we want to determine the direction of the bias, how many flips do we need until we can guess correctly with probability $1 - \delta$? Applying the Chernoff bound, if we make $O\left(\frac{\log \left(\sfrac{1}{\delta}\right)}{\eps^2}\right)$ independent flips and take the more common value among the resulting flips, this will correctly tell us the direction of the bias with probability $1 - \delta$.
 \end{remark}
 
@@ -490,7 +577,7 @@ For the remainder of this section, fix an $f : \pmon \rightarrow \pmo$ which we 
 \begin{equation*}
     \Pr[\tilde{f}(x) = f(x)] > \frac{1}{2} + \frac{1}{n},
 \end{equation*}
-where this probability is over $\tilde{f}$'s randomness. We can think of $\tilde{f}$ as a weak hypothesis for $f$ which we want to convert into a strong hypothesis. Having $\delta = \sfrac{1}{n}$ and $\eps = \sfrac{1}{n}$, suppose now that we make $O\left(\frac{\log (\sfrac{1}{\delta})}{\eps^2}\right) = O\left(n^2 \log n\right)$ queries to $\tilde{f}$ and output the majority; then Remark 4.x says that this resulting function will compute $f$ with very high probability. To turn this intuition into a proof, the first thing we'll need is to convert a weak hypothesis for $f^{\oplus n^4}$ (i.e., a circuit $C$ such that $\Corr(f^{\oplus n^4}, C) \geq \sfrac{1}{n}$) into something resembling $\tilde{f}$. To do so, we will view $f^{\oplus n^4}$ as computing $f$ independently on $n^4$ ``blocks'' of inputs $x_1, \ldots, x_{n^4} \in \pmon$, and show that there must exist at least one block where $C$ is ``somewhat'' correct on ``most'' inputs to that block.
+where this probability is over $\tilde{f}$'s randomness. We can think of $\tilde{f}$ as a weak hypothesis for $f$ which we want to convert into a strong hypothesis. Having $\delta = \sfrac{1}{n}$ and $\eps = \sfrac{1}{n}$, suppose now that we make $O\left(\frac{\log (\sfrac{1}{\delta})}{\eps^2}\right) = O\left(n^2 \log n\right)$ queries to $\tilde{f}$ and output the majority; then \hyperref[r-a-1]{Remark A.1} says that this resulting function will compute $f$ with very high probability. To turn this intuition into a proof, the first thing we'll need is to convert a weak hypothesis for $f^{\oplus n^4}$ (i.e., a circuit $C$ such that $\Corr(f^{\oplus n^4}, C) \geq \sfrac{1}{n}$) into something resembling $\tilde{f}$. To do so, we will view $f^{\oplus n^4}$ as computing $f$ independently on $n^4$ ``blocks'' of inputs $x_1, \ldots, x_{n^4} \in \pmon$, and show that there must exist at least one block where $C$ is ``somewhat'' correct on ``most'' inputs to that block.
 
 More concretely, suppose that $i \in [n^4]$ and $x \in \pmon$. We will define the cylinder $\Cyl_i(x) \subseteq \pmo^{n \times n^4}$ centered at $x$ and $i$ to be the subset of inputs which have the value $x$ fixed in the $i$-th block,
 \begin{equation*}
@@ -498,7 +585,7 @@ More concretely, suppose that $i \in [n^4]$ and $x \in \pmon$. We will define th
 \end{equation*}
 For a fixed $i$ and any $x \in \pmon$, by ``somewhat'' correct, we mean that $\Corr_{\Cyl_i(x)}(f^{\oplus n^4}, C) \geq \sfrac{1}{n}$, and by ``most'' inputs, we mean that this property holds for a $1 - \sfrac{1}{n}$ fraction of $x \in \pmon$. We wish to prove that an $i$ such that ``most'' inputs are computed ``somewhat'' correctly exists.
 
-\begin{lemma}{4.x}[Main Lemma, \cite{BonehLipton}]
+\begin{lemma}{A.1}[Main Lemma, \cite{BonehLipton}]
     Suppose that $C$ is a circuit and $f : \pmon \rightarrow \pmo$ is such that $\Corr(f^{\oplus n^4}, C) \geq \sfrac{1}{n}$. Then there exists a particular $i \in [n^4]$ such that, for $1 - \sfrac{1}{n}$ fraction of ``good'' inputs $x \in \pmon$,
     \begin{equation*}
         \Corr_{\Cyl_i(x)}\left(f^{\oplus n^4}, C\right) \geq \Omega\left(\frac{1}{n}\right).
@@ -525,41 +612,12 @@ Thus, with very high probability, a randomly drawn $C_{\cS}$ will compute $f$ co
 
 To complete the proof, we need to deal with the fact that we don't know which block $i \in [n^4]$ is good. Instead of finding $i$ ahead of time, we will use the process above to construct a list of $n^4$ circuits $C_1, \ldots, C_{n^4}$ and use the fact that we have query access to $f$ to ``test'' which of these circuits corresponds to the good block.
 
-\begin{proof}[Proof \textup{(Of Theorem 4.x)}]
+\begin{proof}[Proof \textup{(Of \hyperref[t-3-1]{Theorem 3.1})}]
     Suppose that $f \in \cF$ and $\cF$ is closed under $\XOR{}$. Consider the following algorithm for strongly learning $\cF$. Since $f^{\oplus n^4} \in \cF$ we can weakly learn $\cF$, we can find with high probability a circuit $C$ such that 
     \begin{equation*}
         \Corr\left(f^{\oplus n^4}, C\right) \geq \frac{1}{n}.
     \end{equation*}
     For each $j \in [n^4]$, choose a random $\cS$ and construct the circuit $C_\cS^{(j)}$ using the process above. To test whether this circuit computes $f$ to an accuracy of $1 - \sfrac{1}{n}$, we can query $\poly(n)$ many examples $(x, f(x))$ and test whether it computes a roughly $1 - \sfrac{1}{n}$ fraction of them correctly. For any $j \in [n^4]$, if $j$ is the good block, this process will output a good circuit for $f$ with very high probability. Thus, since at least one block is good, repeating the process above for every block will output at least one circuit computing $f$ to accuracy $1 - \sfrac{1}{n}$ with high probability. Thus, we can strongly learn $\cF$.
-\end{proof}
-
-\bibliographystyle{alpha}
-\bibliography{references}
-
-\section*{Appendix}
-
-\begin{proof}[Proof \textup{(of \hyperref[t-2-2]{Theorem 2.2})}] 
-    Suppose that $f \in \BPP$, so that there exists a polynomial time algorithm $\cA$ probabilistically computing $f$ using $r = \poly(n)$ random bits. When computing $f$ on $x \in \pmon$, we will view $\cA$ as taking two inputs: the string $x$, and a string of random bits $u \in \pmo^{r}$. The fact that $\cA$ probabilistically computes $f$ means that for every $x \in \pmon$, 
-    \begin{equation*}
-        \Pr_{u \backsim U_r}[\cA(x, u) = f(x)] \geq \sfrac{2}{3}. 
-    \end{equation*}
-    We can convert this to a $\poly(n)$ sized circuit $C$ computing the same function. For any $x \in \pmon$, we will write $C^x$ to denote the circuit which fixes the first $n$ inputs of $C$ to that particular string.
-    \begin{equation*}
-        \Pr_{u \backsim U_r}[C^{x}(u) = f(x)] \geq \sfrac{2}{3}. 
-    \end{equation*}
-    Write $m = |C|$, suppose that $G$ is an $(O(\log m), m)$-PRG computable in $\poly(m)$ time. Then 
-    \begin{equation*}
-        \Pr_{s \backsim U_{O(\log n)}}[C^{x}(G(s)) = f(x)] \geq \sfrac{2}{3} - \sfrac{1}{10} \geq .55.
-    \end{equation*}
-    Since $C$ and $\cA$ compute the same function, 
-    \begin{equation*}
-        \Pr_{s \backsim U_{O(\log n)}}[\cA(x, s) = f(x)] \geq  .55. \tag{1}
-    \end{equation*}
-    Now consider the following deterministic polynomial time algorithm $\cA'$ for computing $f$: on input $x \in \pmon$, iterate over all seed $s \in \pmo^{O(\log n)}$, computing $\cA(x, s)$; then, output whichever bit appears more among these computations. $\cA'$ requires running $G$ and $\cA$ for every string in $\pmo^{O(\log m)}$. Since $m = \poly(n)$, the total running time of $\cA'$ is 
-    \begin{equation*}
-        \left|\pmo^{O(\log n)}\right| \cdot \poly(m) \cdot \poly(n) = 2^{O(\log n)} \cdot \poly(n) = \poly(n).
-    \end{equation*}
-    Moreover, by the guarantee of equation (1), the bit which appears more often among these computations will be the value of $f$. Thus, $\cA'$ is a deterministic polynomial time algorithm computing $f$, so that $f \in \P$.
 \end{proof}
 
 
