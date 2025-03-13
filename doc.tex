@@ -7,20 +7,30 @@
 \date{}
 
 \begin{document}
-    
+
+\iffalse
 \noindent Error Correcting Codes, Hardness Amplification and Boosting \hfill  CS 250, Winter 2025\\
 \hrule
+\fi
+
+\begin{center}
+    \LARGE Error Correcting Codes, Hardness Amplification and Boosting \\
+    \,\\
+    \large CS 250, Winter 2025
+\end{center}
 
 
 \section{Introduction}
 
+The purpose of this report is to discuss the connection between three topics in theoretical computer science: error correcting codes, hardness amplification, and boosting. While each individual topic, as well as the connection between the first two, has been intensively studied, we hope to motivate the connections between all three. The report is outlined as follows: section 2 discusses the connection between hardness amplification and error correcting codes, while section 3 defines boosting and describes it's connection with hardness amplification.
+\iffalse
 The purpose of this report is to discuss the connection between three different topics in theoretical computer science. The first are error correcting codes, the subject of this course. The second is hardness amplification, a technique with applications in cryptography and psuedorandomness; the purpose of hardness amplification is to convert some explicit $f : \pmon \rightarrow \pmo$ which cannot be computed \emph{exactly} by reasonably sized circuits into another explicit function $\hat{f} : \pmon \rightarrow \pmo$ which cannot be computed \emph{approximately} by reasonably sized circuits (such an $\hat{f}$ is called \emph{average case hard}). Explicit average case hard functions are useful for constructing secure cryptosystems and in derandomization, but it seems much more difficult to directly prove that a function is average case hard than to prove that it is worst case hard (i.e., cannot be computed exactly). Thus, having a generic way to ``amplify'' hardness gets us one step closer to constructing explicit average case hard functions. The last of the three is boosting, a technique in machine learning which converts \emph{weak} learning algorithms (i.e., those which output a hypothesis with accuracy only 51\%) to \emph{strong} learning algorithms (i.e., those which output a hypothesis with accuracy 99\%).
-
 Section 2 will discuss the connection between hardness amplification and error correcting codes, giving a longer explanation about why average case hard functions are useful for derandomization and demonstrating how error correcting codes can be used to amplify hardness. Section 3 will describe boosting in more detail, and discuss the connection between hardness amplification and boosting.
+\fi
 
 \subsection{Background}
 
-Throughout this report, we will view bits as in $\{\pm 1\}$ rather than $\zo$. We will denote by $U_n$ the uniform distribution over $\pmon$. We will also need the following definition and fact.
+Throughout this report, we will view bits as in $\{\pm 1\}$ rather than $\zo$. We will denote by $U_n$ the uniform distribution over $\pmon$. We will also need the following definitions and facts.
 
 \begin{definition}{1.1}[Correlation/Advantage] 
     The \emph{corrolation} between two functions $f, g : \pmon \rightarrow \pmo$, written $\Corr(f, g)$, is the probability that they are equal, centered about $\sfrac{1}{2}$, 
@@ -57,7 +67,7 @@ This section will discuss the connection between error correcting codes and hard
     \end{equation*}
 \end{assumption}
 
-Mild hardness strengthens this slightly: instead of asking that any circuit attempting to compute $f$ errs on at least $1$ input, we ask that it messes up on a constant fraction (say 90\%) of inputs.
+Mild hardness strengthens this slightly: instead of asking that any circuit attempting to compute $f$ errs on at least $1$ input, we ask that it messes up on a constant fraction (say 10\%) of inputs.
 
 \begin{assumption}{2}[Mild Hardness] \label{a-2}
     There exists a function $f : \pmon \rightarrow \pmo$ such that $f$ can be computed in time $2^{O(n)}$, but there exists some constant $\delta > 0$ such that 
@@ -75,27 +85,27 @@ Finally, average case hardness strengthens both of the above by a large margin, 
     \end{equation*}
 \end{assumption}
 
-To see just how strong of an assumption this is, consider that for any $f$, the algorithm which just randomly guesses the output achieves correlation $0$ with $f$; thus, \hyperref[a-3]{Assumption 3} supposes that an explicit function exists which even exponentially large circuits cannot compute much better than random guessing. Clearly, \hyperref[a-3]{Assumption 3} implies \hyperref[a-2]{Assumption 2}, and \hyperref[a-2]{Assumption 2} implies \hyperref[a-1]{Assumption 1}; but can we go in the opposite direction? Given a function which large circuits cannot compute exactly, can we construct a function which large circuits cannot compute much better than random guessing? Surprisingly, the answer is yes.
+To see just how strong of an assumption this is, consider that for any $f$, the algorithm which just randomly guesses the value of $f(x)$ achieves correlation $0$ with $f$; thus, \hyperref[a-3]{Assumption 3} supposes that an explicit function exists which even exponentially large circuits cannot compute much better than random guessing. Clearly, \hyperref[a-3]{Assumption 3} implies \hyperref[a-2]{Assumption 2}, and \hyperref[a-2]{Assumption 2} implies \hyperref[a-1]{Assumption 1}; but can we go in the opposite direction? Given a function which large circuits cannot compute exactly, can we construct a function which large circuits cannot compute much better than random guessing? Surprisingly, the answer is yes.
 
-\begin{theorem}{2.1}[\cite{iw97}, \cite{STV99}]\label{t-2-1}
-    If there exists a function $f$ satisfying the worst case hardness assumption, there exists a function $f'$ satisfying the average case hardness assumption.
+\begin{theorem}{2.1}[Hardness amplification, \cite{STV99}]\label{t-2-1}
+    If there exists a function $f$ satisfying the worst case hardness assumption, there exists an $f'$ satisfying the average case hardness assumption.
 \end{theorem}
 
-Before proving this, however, we will discuss why we care about hardness amplification, and why we'd like to find a function satisfying \hyperref[a-3]{Assumption 3}.
+Before proving this, we should discuss why we care about hardness amplification, and why we'd like to find a function satisfying \hyperref[a-3]{Assumption 3}.
 
 \subsection{Why Hardness Amplification?}
 
 While hardness amplifcation is useful in other fields such as cryptography, in this section we will focus on its applications to psuedorandomness. In particular, we will discuss how to use average case hard functions to construct good \emph{psuedorandom generators}, a special type of function which maps a small number of truly random bits to a large number of psuedorandom bits. Here, by ``pseudorandom'' bits, we mean a string of bits which computationally bounded programs cannot distinguish from truly random bits.
 
 \begin{definition}{2.1}
-    We say that a function $G : \pmo^\ell \rightarrow \pmo^{n}$ is an $(\ell, n)$-PRG if, for any size $n$ circuit $C$ over $n$ inputs, 
+    We say that a function $G : \pmo^\ell \rightarrow \pmo^{n}$ is an $(\ell, n)$-PRG (\emph{pseudorandom generator}) if, for any size $n$ circuit $C$ over $n$ inputs, 
     \begin{equation*}
         \left|\Pr_{x \backsim U_n}[C(x)] - \Pr_{s \backsim U_\ell}[C(G(s))]\right| < \frac{1}{10}.
     \end{equation*}
     We will call $\ell$ the \emph{seed length} of $G$.
 \end{definition}
 
-The definition above says that up to a small (i.e., $\sfrac{1}{10}$) difference, the generator $G$ ``fools'' any small circuit into believing it's output is truly random. Why are we interested in psuedorandom generators? The theorem below demonstrates that, given an efficient to compute PRG which has relatively small seed length, any efficient \emph{randomized} algorithm for a problem can be converted into an efficient \emph{deterministic} algorithm.
+The definition above says that up to a small (i.e., $\sfrac{1}{10}$) difference, the generator $G$ ``fools'' any small circuit into believing it's output is truly random. Why are we interested in psuedorandom generators? Given an efficient to compute PRG which has relatively small seed length, any efficient \emph{randomized} algorithm for a problem can be converted into an efficient \emph{deterministic} algorithm.
 
 
 \begin{theorem}{2.2} \label{t-2-2}
@@ -111,32 +121,32 @@ Given that it is unknown whether $\P = \BPP$, it should be clear that we don't k
 Thus, given an average case hard function we can construct a good psuedorandom generator, and given this good psuedorandom generator we can efficiently derandomize $\BPP$. This gives us a promising new avenue to generically derandomize algorithms; however, it seems extremely difficult to prove directly that a function is average case hard. We can reduce this burden by amplifying hardness, meaning we only need to prove worst case hardness for a particular function to construct good PRGs. In other words, taking some function which is computable in exponential time and is believed to be hard (e.g., $\SAT{}$), we can combine Theorems \hyperref[t-2-1]{2.1}, \hyperref[t-2-2]{2.2}, and \hyperref[t-2-3]{2.3} to show that proving worst case lower bounds suffices to derandomize $\BPP{}$.
 
 \begin{corollary}{2.1}
-    If there exists some $\delta > 0$ such that \SAT{} requires circuits of size $\Omega(2^{\delta n})$, then $\P = \BPP$.
+    If there exists $\delta > 0$ such that \SAT{} requires circuits of size $\Omega(2^{\delta n})$, then $\P = \BPP$.
 \end{corollary}
 
-The remainder of this section will outline the connection between hardness and randomness, demonstrating how can convert hard functions into good PRGs.
+The remainder of this section will outline the connection between hardness and randomness, demonstrating how we can convert hard functions into good PRGs.
 
 \subsubsection{A Simple PRG}
 
-To see the key ideas used in constructing a PRG capable of derandomizing BPP, we will use the average case hardness assumption to construct a PRG which increases the size of the pseudorandom string by one bit. While such a PRG is not very useful for derandomization, the analysis in this section will be helpful when we construct our stronger PRG.
+To see the key ideas used in constructing a PRG capable of derandomizing BPP, we will first use the average case hardness assumption to construct a PRG which increases the size of the pseudorandom string by one bit. While such a PRG is not very useful for derandomization, the analysis in this section will be helpful in constructing a stronger PRG.
 
-\begin{theorem}{2.4}[\cite{NW94}]\label{t-2-4}
-    Given the average case hardness assumption, there exists a $(n - 1, n)$-PRG.
+\begin{theorem}{2.4}[One bit PRG, \cite{NW94}]\label{t-2-4}
+    Given \hyperref[a-3]{Assumption 3}, there exists a $(n - 1, n)$-PRG.
 \end{theorem}
 \noindent
 Have $f : \pmo^{n - 1} \rightarrow \pmo$ be an average case hard function. Our $(n - 1, n)$-PRG $G$ will be defined as follows:
 \begin{equation*}
     G(s_1, \ldots, s_{n - 1}) = \bigl(s_1, \ldots, s_{n - 1}, f(s_1, \ldots, s_{n - 1})\bigr).
 \end{equation*}
-In this case, the first $n - 1$ bits are truly random, and so no circuit will be able to distinguish them from uniform random bits. For the last bit, since any small circuit can't do much better than guessing the value of $f$, this bit will also appear essentially random. To formalize this, we will use Yao's next bit prediction lemma. Intuitively, it reduces the task of analyzing a circuit's behavior on an entire psuedorandom string to analyzing it's ability to predict a particular bit given the previous bits.
-\begin{lemma}{2.1}[Yao's next bit prediction lemma, \cite{Yao82}]\label{l-2-1}
+In this case, the first $n - 1$ bits are truly random, and so no circuit will be able to distinguish them from uniform random bits. For the last bit, since any small circuit can't do much better than guessing the value of $f$, this bit will also appear essentially random. To formalize this, we will use Yao's next bit prediction lemma. Intuitively, it reduces the task of analyzing a circuit's behavior on an entire psuedorandom string to analyzing it's ability to predict any particular bit of that string given the preceding bits.
+\begin{lemma}{2.1}[Next Bit Prediction Lemma, \cite{Yao82}]\label{l-2-1}
     Write $G(s) = (z_1, \ldots, z_n)$. Suppose that for all $i \in [n]$, any circuit $C : \pmo^{i - 1} \rightarrow \pmo$ of size $n$ has 
     \begin{equation*}
         \Corr\left(C(z_1, \ldots, z_{i - 1}), z_i\right) < \frac{\epsilon}{n}. \tag{1}
     \end{equation*}
     Then for any $C : \pmo^n \rightarrow \pmo$ of size $n$, 
     \begin{equation*}
-        \left|\Pr_{x \backsim U_n}[C(x)] - \Pr_{s \backsim U_\ell}[C(G(s))]\right| < \epsilon. \tag{2}
+        \left|\Pr_{x \backsim U_n}[C(x)] - \Pr_{s \backsim U_{n-1}}[C(G(s))]\right| < \epsilon. \tag{2}
     \end{equation*}
 \end{lemma}
 Note that fixing $\epsilon = \sfrac{1}{10}$, the condition in equation (2) says that $G$ is a $(n - 1, n)$-PRG. Thus, to prove  \hyperref[t-2-4]{Theorem 2.4}, we just need to show that $G$ satisfies the hypothesis of \hyperref[l-2-1]{Lemma 2.1}: the $i$-th bit should be unpredictable given the first $i - 1$ bits.
@@ -161,8 +171,8 @@ Note that fixing $\epsilon = \sfrac{1}{10}$, the condition in equation (2) says 
 
 Extending the analysis above, Nisan and Wigderson \cite{NW94} used the average case hardness assumption to construct a pseudorandom generator stretching the seed bits exponentially further.
 
-\begin{theorem}{2.5}[Nisan-Wigderson Generator, \cite{NW94}]
-    Given the average case hardness assumption, there exists a $(O(\log n), n)$-PRG.
+\begin{theorem}{2.5}[NW Generator, \cite{NW94}]
+    Given \hyperref[a-3]{Assumption 3}, there exists a $(O(\log n), n)$-PRG.
 \end{theorem}
 
 \noindent
@@ -248,9 +258,9 @@ As a picture, our psuedorandom generator $G_\cS$ looks something like this.
 \end{center}
 \noindent
 \fi
-The key to creating a good psuedorandom generator is picking a good collection of subsets $\cS$, and to do that, we need to explain what we mean by ``roughly disjoint'' subsets. The reason why we can't just take any collection of subsets is that, if two distinct subsets $S_i$ and $S_j$ overlap too much, then the $i$-th and $j$-th bits of $G_\cS$ will be very correlated, preventing us from using Yao's next bit prediction lemma in our analysis. On the other hand, if we wanted to make each subset truly disjoint, the seed length of our PRG $G_\cS$ would be at least $\sfrac{2}{\delta} \cdot n \cdot \log n = O(n \log n)$, making this a terrible PRG.
+The key to creating a good psuedorandom generator is picking a good collection of subsets $\cS$, and to do that, we need to explain what we mean by ``roughly disjoint.'' The reason why we can't just take any collection of subsets is that, if two distinct subsets $S_i$ and $S_j$ overlap too much, then the $i$-th and $j$-th bits of $G_\cS$ will be very correlated, preventing us from using Yao's next bit prediction lemma in our analysis. On the other hand, if we wanted to make each subset truly disjoint, the seed length of our PRG $G_\cS$ would be at least $\sfrac{2}{\delta} \cdot n \cdot \log n = O(n \log n)$, making this a terrible PRG.
 
-Thus, we need to choose $\cS$ to balance between these two extremes: we need some overlap so that the seed length is small, but not too much that different bits in the output are very correlated. As it turns out, the following requirements will suffice for $G_\cS$ to be a good PRG:
+Thus, we need to choose $\cS$ to balance between these two extremes: some overlap keeps the seed length small, but too much creates highly correlated outputs. As it turns out, the following requirements will suffice for $G_\cS$ to be a good PRG:
 \begin{enumerate}
     \item $\cS$ contains $n$ subsets $S_1, S_2, \ldots, S_n \subseteq [c \log n]$,
     \item every subset $S_i$ has size $|S_i| = \sfrac{2}{\delta} \cdot \log n$,
@@ -262,13 +272,11 @@ Initially, it is not obvious that such a collection $\cS$ exists: can we even fi
     There exists a constant $c > 1$ such that a $(c \log n, \sfrac{2}{3} \cdot \log n, \log n, n)$-combinatorial design exists and can be produced in $\poly(n)$ time.
 \end{lemma}
 
-While we will not go through the analysis here, one can prove \hyperref[l-2-2]{Lemma 2.2} with the natural greedy algorithm: start with an empty collection $\cS$ and iterate through all subsets of size $\sfrac{2}{\delta} \cdot \log n$, adding any subset to $\cS$ which does not overlap too much with the subsets already added to $\cS$. 
-
-Thus, combining \hyperref[l-2-2]{Lemma 2.2} with \hyperref[a-3]{Assumption 3} using our construction above, $G_\cS$ will be a $(O(\log n), n)$-PRG. In sum, we can construct good PRGs from average case hard functions, allowing us to use such an assumption to derandomize \BPP{}.
+While we will not go through the analysis here, one can prove \hyperref[l-2-2]{Lemma 2.2} with the natural greedy algorithm: start with an empty collection $\cS$ and iterate through all subsets of size $\sfrac{2}{\delta} \cdot \log n$, adding any subset to $\cS$ which does not overlap too much with the subsets already added to $\cS$. Combining \hyperref[l-2-2]{Lemma 2.2} with \hyperref[a-3]{Assumption 3} using our construction above, one can prove that $G_\cS$ will be a $(O(\log n), n)$-PRG. Since the focus of this report is error correcting codes, we will not go through this proof here; a full version is available in \cite{NW94}. In sum, we can construct good PRGs from average case hard functions, allowing us to use such an assumption to derandomize \BPP{}.
 
 \subsection{Worst Case Hardness to Mild Hardness}
 
-Now that we've completed our discussion of the connection between average case hard functions and psuedorandom generators, we will move on to the the actual task of hardness amplification. To see the essential connection between hardness amplification and error correcting codes, we will start by proving that we can convert worst case hard functions into mildly hard functions given an error correcting code $\cC$ which is locally decodable; in the following section, we will work through actually constructing such a code.
+Now that we've completed our discussed the connection between average case hard functions and psuedorandom generators, we will move on to the the actual task of hardness amplification. To see the essential connection between hardness amplification and error correcting codes, we will start by proving that we can convert worst case hard functions (\hyperref[a-1]{Assumption 1}) into mildly hard functions (\hyperref[a-2]{Assumption 2}) given an error correcting code $\cC$ which is locally decodable; in the next section, we will work through actually constructing such a code.
 
 \begin{theorem}{2.6}\label{t-2-6}
     Suppose that $\cC$ is a $[m^2, m]_2$ code with the following properties: (1) the encoding map $\Enc : \pmo^m \rightarrow \pmo^{m^2}$ is computable in $\poly(m)$ time, and (2) there exists a local decoding algorithm $\LDec$ which can correct up to a relative distance of $.05$ running in $\polylog(m)$ time. Then the worst case hardness assumption implies the mild hardness assumption.
@@ -280,7 +288,7 @@ Now that we've completed our discussion of the connection between average case h
     \begin{equation*}
         \Corr\left(f, 2^{\delta n}\right) < 1.
     \end{equation*}
-    Having $N = 2^n$, we can represent $f$ as a string of length $N$ by its truth table $\TT(f) \in \pmo^N$. Then when we encode this string using our code $\cC$, we can view the string $\Enc(\TT(f)) \in \pmo^{2N}$ as the truth table of a function $\TT(\hat{f})$, where $\hat{f} : \pmo^{2n} \rightarrow \pmo$. We claim that for some constant $\delta' > 0$,
+    Having $N = 2^n$, we can represent $f$ as a string of length $N$ by its truth table $\TT(f) \in \pmo^N$. If we encode this string using our code $\cC$, we can view the string $\Enc(\TT(f)) \in \pmo^{N^2}$ as the truth table of a function $\TT(\hat{f})$, where $\hat{f} : \pmo^{2n} \rightarrow \pmo$. We claim that for the constant $\delta' := \sfrac{\delta}{3}$,
     \begin{equation*}
         \Corr\left(\hat{f}, 2^{\delta' n}\right) \leq .9.
     \end{equation*}
@@ -292,7 +300,7 @@ Now that we've completed our discussion of the connection between average case h
     \begin{equation*}
         |C_{\sfrac{2}{3}}|  \leq \poly(n) + \poly(n) |C| \leq 2^{(\delta' + o(1))n}.
     \end{equation*}
-    Using the fact that circuits can be derandomized with only a polynomial blow up in size, we can obtain a circuit $C'$ of size $2^{(\delta' + o(1))n}$ compute $f$ exactly. Taking $\delta' = \delta / 3$, this would contradict the fact that $f$ cannot be computed exactly by circuits of size $2^{\delta n}$. Thus, it must be true that 
+    Using the fact that circuits can be derandomized with only a polynomial blow up in size, we can obtain a circuit $C'$ of size $2^{(\delta' + o(1))n}$ compute $f$ exactly. Since $\delta' = \sfrac{\delta}{3}$, this would contradict the fact that $f$ cannot be computed exactly by circuits of size $2^{\delta n}$. Thus, it must be true that 
     \begin{equation*}
         \Corr\left(\hat{f}, 2^{\delta n / 3}\right) \leq .9.
     \end{equation*}
@@ -308,7 +316,7 @@ Now that we've completed our discussion of the connection between average case h
     \begin{equation*}
         \RM_q(m ,d) = \left\{(f(\gamma_1), f(\gamma_2), \ldots, f(\gamma_{q^m})) : f \in \F_q[X_1, \ldots, X_m], \, \deg (f) \leq d\right\},
     \end{equation*}
-    where $\gamma_1, \ldots, \gamma_{q^m}$ is a canonical ordering of $\F_q^m$. This code has dimension $k = \binom{m + d}{d}$, block length $q^m$, and relative distance $\delta = 1 - d/ q$.
+    where $\gamma_1, \ldots, \gamma_{q^m}$ is some ordering of $\F_q^m$. This code has dimension $k = \binom{m + d}{d}$, block length $q^m$, and relative distance $\delta = 1 - d/ q$.
 \end{definition}
 
 In class, we saw the following guarantees for locally correcting the Reed-Muller code.
@@ -319,7 +327,7 @@ In class, we saw the following guarantees for locally correcting the Reed-Muller
 
 For a second, let's put aside the fact that we can only locally correct, rather than decode, this code, and let's also ignore the fact that it is a binary code. How should we pick $d$, $q$ and $m$ to achieve the regime required by \hyperref[t-2-6]{Theorem 2.6}? As a start, we need the number of queries to be poly-logarithmic in $n$, say $q = \log^3 n$. We'll also want the block length to be $\poly(n)$. Thus, we should take $m = \log n / \log \log n$, so that the block length is 
 \begin{equation*}
-    q^n = \left(\log^3 n\right)^{\log n / \log \log n} = 2^{3\log \log n \log n / \log \log n} = 2^{3\log n} = n^3.
+    q^n = \left(\log^3 n\right)^{\log n / \log \log n} = 2^{3\log \log n \cdot \log n / \log \log n} = 2^{3\log n} = n^3.
 \end{equation*}
 Next, we need the dimension $k$ to be at least $n$, so that we can encode an entire string of length $n$. See that 
 \begin{equation*}
@@ -345,7 +353,7 @@ In class, we saw the following guarantees for locally correcting the Hadamard co
     There exists a local corrector $\LCor_\Had$ for the Hadamard code $\Had_k$ which locally corrects up to a relative distance of $\delta \leq \sfrac{1}{4}$ with $2$ queries in time $O(k)$.
 \end{claim}
 
-Fixing $k = \log |\F|$, we will write $\Had$ for the Hadamard code with parameter $k$. Let's suppose for a second that we could transform each of our local correcting algorithms to local decoding algorithms. Then we claim that the concatenated code $\cC = \Had \concat \RM$ will satisfy the requirements of \hyperref[t-2-6]{Theorem 2.6}.
+Fixing $k = \log |\F|$, we will write $\Had$ for the Hadamard code with parameter $k$. Let's suppose for a second that we could transform each of our local \emph{correcting} algorithms to local \emph{decoding} algorithms. Then we claim that the concatenated code $\cC = \Had \concat \RM$ will satisfy the requirements of \hyperref[t-2-6]{Theorem 2.6}.
 
 \begin{claim}{2.3}
     The code $\cC$ is a $[n^3\log^3 n, n]_2$ code which can be locally decoded up to a relative distance of $\sfrac{1}{28}$ in $\polylog(n)$ time.
@@ -357,7 +365,7 @@ Fixing $k = \log |\F|$, we will write $\Had$ for the Hadamard code with paramete
     To see why $\cC$ can be locally decoded in time $\polylog(n)$ up to a distance of $\sfrac{1}{28}$, we can use the naive strategy for decoding concatenated codes: run the local decoder for the Reed-Muller code, replacing each query to a given symbol with a query to the local decoder for the Hadamard code. The proof that this works correctly is similar to the proof of decoding concatenated codes we saw in class. Together, this is still run in $\polylog(n)$ time. Thus, $\cC$ can be locally decoded in $\polylog(n)$ time.
 \end{proof}
 
-So, given two local decoding algorithms for $\Had$ and $\RM$, we can construct our desired code. To convert our local correctors to local decoders, recall the notion of systematic encodings.
+So, given two local \emph{decoding} algorithms for $\Had$ and $\RM$, we can construct our desired code. To convert our local correctors to local decoders, recall the notion of systematic encodings.
 
 \begin{definition}{2.4}[Systematic Encodings]
     A $[\ell, n]_2$  code with encoder $\Enc : \pmo^{n} \rightarrow \pmo^{\ell}$ is systematic if for every bit $i_{in} \in [n]$, there exists a bit $i_{out} \in [\ell]$ such that for any message $w \in \pmon$, 
@@ -366,7 +374,7 @@ So, given two local decoding algorithms for $\Had$ and $\RM$, we can construct o
     \end{equation*}
 \end{definition}
 
-In other words, a systematic encoding of a code allows one to obtain any bit in the original message by reading a particular bit of the codeword. Thus, if a code is both locally correctable and systematically encodable, then we can systematically decode it, since to recover a particular index of the message, we just need to locally correct the corresponding index in the code word. 
+In other words, a systematic encoding of a code allows one to obtain any bit in the original message by reading a particular bit of the codeword. Thus, if a code is both locally correctable and systematically encodable, then we can systematically decode it, since to recover a particular index of the message, we just need to locally correct the corresponding index in the corrupted encoding. 
 
 \subsubsection{Systematic Encodings and Low Degree Extensions}
 
@@ -380,7 +388,7 @@ In particular, in the index corresponding to $x = e_i$, the value of $\Enc_\Had(
     The Hadamard code $\Had$ can be efficiently, systematically encoded, and locally decoded up to a relative distance of $\delta \leq \sfrac{1}{4}$ with $2$ queries.
 \end{claim}
 
-However, we have to be a bit more careful with the Reed-Muller code. The encoder we saw in class views the message as coefficients of a low degree polynomial, while the encoded word is the value of that polynomial on every point in $\F^m$. To systematically encode the Reed-Muller code, we will need to view the message as a subset of these evaluation points, and transform these into a polynomial which takes the same values on these points. Before specifying exactly what we mean by this, let's recall our setup from the section above: our code $\RM$ was a Reed-Muller code $\RM_q(m, d)$, where $q = \log^3 n$, $m = \log n / \log \log n$, and $d = \log^2 n$. This code had dimension at least $n$, so that we can encode any $w \in \zo^n$ to a codeword $c \in \RM_q(m, d)$. To following claim gives a way to systematically encode $\RM$ using low degree extensions.
+However, we have to be a bit more careful with the Reed-Muller code. The encoder we saw in class views the message as coefficients of a low degree polynomial, while the encoded word is the value of that polynomial on every point in $\F^m$. To systematically encode the Reed-Muller code, we will need to view the message as a subset of these evaluation points, and transform these into a polynomial which takes the same values on these points. Before specifying exactly what we mean by this, let's recall our setup from the section above: our code $\RM$ was a Reed-Muller code $\RM_q(m, d)$, where $q = \log^3 n$, $m = \log n / \log \log n$, and $d = \log^2 n$. This code had dimension at least $n$, so that we can encode any $w \in \zo^n$ to a codeword $c \in \RM_q(m, d)$. The following claim gives a way to systematically encode $\RM$ using low degree extensions.
 
 \begin{claim}{2.5}
     Our Reed-Muller code $\RM$ can be efficiently systematically encoded.
@@ -414,11 +422,11 @@ However, we have to be a bit more careful with the Reed-Muller code. The encoder
 
 In our proof of \hyperref[t-2-6]{Theorem 2.6}, we could amplify the hardness of a worst-case hard $f$ to $1 - \delta$, where our code $\cC$ was locally decodable up to a distance of $\sfrac{\delta}{2}$. However, since our code $\cC$ must be binary, we could not possibly local decode it past a distance of $\sfrac{1}{4}$, and thus we cannot get to exponentially small correlation. To break through this barrier, we will use a technique we've seen in class to decode much closer to the true distance of the code: list decoding. Recall what we're trying to prove.
 
-\begin{theorem}{2.7}[Full hardness amplification, \cite{iw97}, \cite{STV99}]\label{t-2-7}
-    The worst case hardness assumption implies the average case hardness assumption.
+\begin{theorem}{2.7}[Full hardness amplification, \cite{STV99}]\label{t-2-7}
+    \hyperref[a-1]{Assumption 1} implies \hyperref[a-3]{Assumption 3}.
 \end{theorem}
 
-Given a good locally list decodable code, we can adapt the proof of \hyperref[t-2-6]{Theorem 2.6} to prove \hyperref[t-2-7]{Theorem 2.7}; while we will need slightly different choices of $m$, $q$ and $d$, the analysis is essentially the same. Then proving Then proving \hyperref[t-2-7]{Theorem 2.7} reduces to finding local list decoders for both the Hadamard code and the Reed-Muller code. We already saw in class that the Hadamard code can be local list decoded efficiently:
+Given a good locally list decodable code, we can adapt the proof of \hyperref[t-2-6]{Theorem 2.6} to prove \hyperref[t-2-7]{Theorem 2.7}; while we will need slightly different choices of $m$, $q$ and $d$, the analysis is essentially the same. Then proving \hyperref[t-2-7]{Theorem 2.7} reduces to finding local list decoders for both the Hadamard code and the Reed-Muller code. We already saw in class that the Hadamard code can be local list decoded efficiently:
 
 \begin{theorem}{2.8}[Goldreich-Levin Theorem, \cite{goldreichlevin}] \label{t-2-8}
     The Hadamard Code $\Had_k$ can be local list decoded up to a distance of $\sfrac{1}{2} - \eps$ in time $\poly(k, \sfrac{1}{\eps})$.
@@ -433,7 +441,7 @@ The remainder of this section will walk through a proof that the Reed-Muller cod
 Before jumping into the proof, note that we will use a slightly different definition of local list decoding: rather than viewing a local list decoder as a collection of algorithms, we will view it as a single algorithm which receives a small piece of ``advice.'' This definition is equivalent to the one used in class, but will be a bit easier for us to work with.
 
 \begin{definition}{2.5}[Local List Decoding]
-    Suppose that $\cC$ is a $[m, n]_2$ code with encoding map $\Enc : \pmo^{n} \rightarrow \pmon$. We say that $\cC$ is $(\delta, \ell)$-locally list decodable if there exists a random algorithm $\cA$ over inputs $i \in [n]$, $a \in \pmo^{\log \ell}$, so that for any $w \in \pmo^m$, for every $c \in \cC$ such that $\delta(c, w) \leq \delta$, there exists an advice string $a_c \in \pmo^{\log \ell}$ such that $\cA$ will locally decode $w$ at the index $i$ given the advice $a_c$.
+    Suppose that $\cC$ is a $[m, n]_2$ code with encoding map $\Enc : \pmo^{n} \rightarrow \pmo^m$. We say that $\cC$ is $(\delta, \ell)$-locally list decodable if there exists a random algorithm $\cA$ over inputs $i \in [n]$ and $a \in \pmo^{\log \ell}$, so that for any $w \in \pmo^m$, for every $c \in \cC$ such that $\delta(c, w) \leq \delta$, there exists an advice string $a_c \in \pmo^{\log \ell}$ such that $\cA$ will locally decode $w$ at the index $i$ given the advice $a_c$.
 \end{definition}
 
 To construct a local list corrector for this code, we'll begin by slightly modifying the local corrector for the Reed-Muller code we've seen in class. Rather than drawing a random line about an input and running a Reed-Solomon unique decoder, we will run a Reed-Solomon list decoder. Suppose that $g : \F^m \rightarrow \F$ is a corrupted codeword such that $\delta(g, p) \leq 1 - \eps$ for some true codeword $p \in \F[X_1, \ldots, X_m]$. Then the algorithm runs as follows:
@@ -444,7 +452,7 @@ To construct a local list corrector for this code, we'll begin by slightly modif
     \item[$\rightarrow$ 3:] Output $h_j(x)$.
 \end{enumerate}
 For any $x \in \F^m$, with high probability over a random line $\ell$, the restriction $g|_\ell$ will be relatively close to $p|_\ell$, and so for some index $j \in [s]$ we will have $p|_\ell = h_j$ so that $h_j(x) = p(x)$. Does this mean that the algorithm works?
-Unfortunately, the answer is no. The most important issue is that for seperate $x_1, x_2 \in \F^m$, it will not necessarily be true that the same advice $j \in \N$ will work for both of these inputs. To get around this, we will start by showing that with high probability over the advice we give, a similar algorithm will succeed. To do so, rather than telling the corrector the index $j$, we will give it the evaluation of the polynomial $p$ at a random point $y$ on the line $\ell$. While this does not really solve the issue with our first algorithm, we're hoping that by showing our algorithm works with random advice, we can find a single piece of advice which works for almost all inputs. The algorithm now runs as follows:
+Unfortunately, the answer is no. The most important issue is that for seperate $x_1, x_2 \in \F^m$, it will not necessarily be true that the same advice $j \in \N$ will work for both of these inputs. To get around this, we will start by showing that with high probability over the advice we give, a similar algorithm will succeed. To do so, rather than telling the corrector the index $j$, we will give it the evaluation of the polynomial $p$ at a random point $y$ on the line $\ell$. While this does not really solve the issue with our first algorithm, we hope that by showing our algorithm works with high probability over random advice, we can find a single piece of advice which works for almost all inputs. The algorithm now runs as follows:
 \begin{enumerate}
     \item[Input:] Evaluation point $x \in \F^m$.
     \item[$\rightarrow$ 1:] Draw a random line $\ell$ passing through $x$ and $y \backsim \ell$. Get as advice $(y, p(y))$.
@@ -453,7 +461,7 @@ Unfortunately, the answer is no. The most important issue is that for seperate $
 \end{enumerate}
 We claim that, with high probability over our choice of our point of advice $y$, the algorithm above outputs $p(x)$. Below, when we say that a line $\ell$ is ``good,'' we mean that $\delta(p|_\ell, g|_\ell) \leq 1 - \eps$.
 
-\begin{claim}{2.6}
+\begin{claim}{2.6}\label{c-2-6}
     If $\ell$ is ``good,'' then with high probability, the algorithm above outputs $p(x)$.
 \end{claim}
 \begin{proof}
@@ -486,25 +494,25 @@ To prove that this will be a good approximate local list corrector, we claim tha
     \begin{equation*}
         \E_{y, \ell}[\delta(p|_\ell, g|_\ell)] = 1 - \eps,
     \end{equation*}
-    given a random $y$ and $\ell$, the probability that property (1) holds is $1 - \sfrac{1}{100} = .99$. The proof that property (2) holds is similar to our proof of Claim 2.x; for a fixed $x$, random $\ell$ and random $y$, we showed such a polynomial $h$ does not exist with probability $1 - O(\eps)$. As $\eps \rightarrow 0$, we can say that this occurs with probability at least $.99$ as well. Thus, applying the union bound, a random $y \backsim \F^m$ and line $\ell$ will satisfy be good with probability $.98$, and so we can find a fixed point $y \in \F^m$ such that a random line $\ell$ through $y$ will be good with probability $.98$. If we give this $y$ as advice to our algorithm, it will compute $p(x)$ correctly for $98$\% of $x \in \F^m$. 
+    given a random $y$ and $\ell$, the probability that property (1) holds is $1 - \sfrac{1}{100} = .99$. The proof that property (2) holds is similar to our proof of \hyperref[c-2-6]{Claim 2.6}; for a fixed $x$, random $\ell$ and random $y$, we showed such a polynomial $h$ does not exist with probability $1 - O(\eps)$. As $\eps \rightarrow 0$, we can say that this occurs with probability at least $.99$ as well. Thus, applying the union bound, a random $y \backsim \F^m$ and line $\ell$ will satisfy be good with probability $.98$, and so we can find a fixed point $y \in \F^m$ such that a random line $\ell$ through $y$ will be good with probability $.98$. If we give this $y$ as advice to our algorithm, it will compute $p(x)$ correctly for $98$\% of $x \in \F^m$. 
 \end{proof}
 
-The final step in proving Theorem 2.x is to convert the algorithm above, which outputs the correct answer on $98$\% of inputs, to one which outputs the correct answer with high probability on all inputs. While this might seem like a big issue, we've actually already seen how to do this: locally correcting the Reed-Muller code. More precisely, suppose we receive a corrupted codeword $g : \F^m \rightarrow \F$ such that $\delta(g, p) \leq 1 - \eps$. Given the advice $(y, p(y))$, our algorithm above produces a corrupted $\tilde{p} : \F^m \rightarrow p$, such that $\delta(p, \tilde{p}) \leq .02$. Using our local corrector for the Reed-Muller code, simulating queries to $\tilde{p}$ with calls to our algorithm above, we can recover with high probability any particular bit of $p$. Thus, we can locally list correct the Reed-Muller code. Since we've also proven that we can systematically encode the Reed-Muller code, we can locally list decode this code as well. This completes the proof of \hyperref[t-2-9]{Theorem 2.9}.
+The final step in proving Theorem 2.x is to convert the algorithm above, which outputs the correct answer on $98$\% of inputs, to one which outputs the correct answer with high probability on all inputs. While this might seem like a big issue, we've actually already seen how to do this: locally correcting the Reed-Muller code. More precisely, suppose we receive a corrupted codeword $g : \F^m \rightarrow \F$ such that $\delta(g, p) \leq 1 - \eps$. Given the advice $(y, p(y))$, our algorithm above produces a corrupted $\tilde{p} : \F^m \rightarrow p$, such that $\delta(p, \tilde{p}) \leq .02$. Using our local corrector for the Reed-Muller code, simulating queries to $\tilde{p}$ with calls to our algorithm above, we can recover with high probability any particular bit of $p$. Thus, we can locally list correct the Reed-Muller code. Since we've also proven that we can systematically encode the Reed-Muller code, we can locally list decode this code as well. Combining this with Goldreich-Levin algorithm \cite{goldreichlevin} for local list decoding the Hadamard code, one can complete the proof of \hyperref[t-2-9]{Theorem 2.9}.
 
-\section{Boosting and Uniform Hardness Amplification}
+\section{Boosting}
 
 
-In this section, we will define the type of boosting we will be interested in and discuss it's connection to hardness amplification.
+In this section, we will define boosting and discuss its connection to hardness amplification. First, we need to define the model of machine learning we will use.
 
 \begin{definition}{3,1}
-    Suppose that $\cF$ is a class of functions. We say that a probabilistic algorithm $\cA$ learns $\cF$ to accuracy $\gamma$ if, given query access to some $f \in \cF$, $\cA$ runs in $\poly(n)$ time and produces with probability $99\%$ a circuit $C$ such that 
+    Suppose that $\cF$ is a class of functions. We say that a probabilistic algorithm $\cA$ learns $\cF$ to accuracy $\gamma$ if, given query access to some unknown $f \in \cF$, $\cA$ runs in $\poly(n)$ time and produces with probability $99\%$ a circuit $C$ such that 
     \begin{equation*}
         \Corr(f, C) \geq \gamma.
     \end{equation*}
 \end{definition}
 We will be interested in two types of learning: weak and strong learning. We say that an algorithm $\cA$ \emph{strongly learns} a class $\cF$ if is learns the class to an accuracy of $1 - \sfrac{1}{n}$, while we say that it \emph{weakly learns} a class $\cF$ if it learns the class to an accuracy of $\sfrac{1}{n}$. In other words, a strong learner outputs a circuit whose correlation with the target function becomes arbitrarily close to $1$, while a weak learner outputs a circuit which does only slightly better than random guessing.
 
-Our goal is to design a boosting algorithm which, given query access to a weak learner $\cA$, can efficiently strongly learn a given class of functions. In particular, the algorithms we discuss in this section will query the weak learner only once; notably, this is different from the typical setting for boosting.\footnote{Typically, a boosting algorithm converts a weak learning algorithm $\cA$ which can learn over \emph{any} distribution into a strong learning algorithm over the uniform distribution. Such an algorithm works by repeatedly querying the weak learning algorithm to incrementally update their ``strong'' hypothesis, calling the weak learner on distributions where their hypothesis performs the worst.} More concretely, suppose that $f \in \cF$ is the function we are trying to learn. Our boosting algorithm will construct a modified function $\hat{f}$ which can be efficiently computed by querying $f$, and ask $\cA$ to produce a weak circuit $C$ getting correlation $\Corr(\hat{f}, C) \geq \sfrac{1}{n}$ with $\hat{f}$. Next, it will somehow convert this into a circuit $C'$ strongly computing $\Corr(f, C') \geq 1 - \sfrac{1}{n}$. In order for this to work, we'll need the function $\hat{f}$ to actually be in the class $\cF$. The way we will guarantee this is through the following definition.
+Our goal is to design a ``boosting'' algorithm which, given query access to a \emph{weak} learner $\cA$ for some class $\cF$, can \emph{strongly} learn $\cF$. In particular, the algorithms we discuss in this section will query the weak learner only once; notably, this is different from the typical setting for boosting.\footnote{Typically, a boosting algorithm converts a weak learning algorithm $\cA$ which can learn over \emph{any} distribution into a strong learning algorithm over the uniform distribution. Such an algorithm works by repeatedly querying the weak learning algorithm to incrementally update their ``strong'' hypothesis, calling the weak learner on distributions where their hypothesis performs the worst.} More concretely, suppose that $f \in \cF$ is the function we are trying to learn. Our boosting algorithm will construct a modified function $\hat{f}$ which can be efficiently computed by querying $f$, and ask $\cA$ to produce a weak circuit $C$ getting correlation $\Corr(\hat{f}, C) \geq \sfrac{1}{n}$ with $\hat{f}$. Next, it will somehow convert this into a circuit $C'$ strongly computing $\Corr(f, C') \geq 1 - \sfrac{1}{n}$. In order for this to work, we'll need the function $\hat{f}$ to actually be in the class $\cF$. The way we will guarantee this is through the following definition.
 
 \begin{definition}{3.2}
     We say that a class of functions $\cF$ is closed under $g : \pmo^k \rightarrow \pmo$ if, for any $f \in \cF$, the function $g \diamond f : \pmo^{n \cdot k} \rightarrow \pmo$ is also in $\cF$, where this function is defined as
@@ -514,7 +522,7 @@ Our goal is to design a boosting algorithm which, given query access to a weak l
     Here, $k$ should be viewed as a function of $n$.
 \end{definition}
 
-Now, the choice of $g$ (i.e., the choice of $\hat{f}$) becomes the core of the boosting algorithm, with different functions yielding different trade offs. If $g$ is too complex, $g \diamond f$ may not be in the class $\cF$, but if $g$ is too simple, we might not be able to convert a circuit weakly computing $g \diamond f$ to one strongly computing $f$. To keep things concrete, we will fix $\cF$ to be the class of functions which are computable by a polynomial sized circuit for the remainder of this section. While there are many reasonable choices for $g$, we will have it be the XOR function. 
+Now, the choice of $g$ (i.e., the choice of $\hat{f}$) becomes the core of the boosting algorithm, with different functions yielding different trade offs. If $g$ is too complex, $g \diamond f$ may not be in the class $\cF$ (and so our weak learner $\cA$ will not be able to learn $\hat{f}$), but if $g$ is too simple, we can't convert a circuit \emph{weakly} computing $g \diamond f$ to one \emph{strongly} computing $f$. To keep things concrete, we will fix $\cF$ to be the class of functions which are computable by a polynomial sized circuit for the remainder of this section. While there are many reasonable choices for $g$, we will have it be the XOR function. 
 
 \begin{definition}{3.3}
     For a function $f : \pmon \rightarrow \pmo$, we denote by $f^{\oplus k} : \pmo^{n \cdot k} \rightarrow \pmo$ by 
@@ -523,7 +531,7 @@ Now, the choice of $g$ (i.e., the choice of $\hat{f}$) becomes the core of the b
     \end{equation*}
 \end{definition}
 
-We will say that $\cF$ is closed under $k-\XOR$ if $f^{\oplus k} \in \cF$ for every $f \in \cF$. Since we've fixed $\cF$ to be the set of functions computable by polynomial size circuits, $\cF$ is closed under $p(n)-\XOR$ for any polynomial $p(n)$. Boneh and Lipton \cite{BonehLipton} constructed a boosting algorithm which works under a similar assumption.
+We will say that $\cF$ is closed under $k-\XOR$ if $f^{\oplus k} \in \cF$ for every $f \in \cF$. Since we've fixed $\cF$ to be the set of functions computable by polynomial size circuits, $\cF$ is closed under $p(n)-\XOR$ for any polynomial $p(n)$. Boneh and Lipton \cite{BonehLipton} constructed a boosting algorithm which works under this assumption.
 
 \begin{theorem}{3.1}[Boosting with XOR, \cite{BonehLipton}]\label{t-3-1}
     Suppose that $\cF$ is closed under $n^4-\XOR$ and can be efficiently weakly learned. Then $\cF$ can be efficiently strongly learned.
@@ -533,12 +541,12 @@ Their boosting algorithm runs as follows: in order to strongly learn $f$, run th
 
 So what does this have to do with hardness amplification? In both settings, we begin with a circuit approximately computing $\hat{f}$ and use it to construct a circuit computing the original $f$ exactly (or almost exactly). This gives us an intuition for why this sort of boosting works: by learning a weak hypothesis for a ``harder'' version of $f$ (i.e., $f^{\oplus n^4}$), we hope that this contains enough information about $f$ to construct a circuit strongly computing $f$. 
 
-In sum, our strategy for hardness amplification (i.e., a proof by contradiction) and this version of boosting are essentially identical, so that better boosting algorithms can yield stronger hardness amplification and vice versa. Moreover, we've already seen that error correcting codes are a useful tool for amplifying hardness, and we hope that they could also be used in developing boosting algorithms.
+In sum, our strategy for hardness amplification (i.e., a proof by contradiction) and this version of boosting are essentially identical, so that better boosting algorithms can yield stronger hardness amplification and vice versa. Moreover, we've already seen that error correcting codes are a useful tool for amplifying hardness. We hope that a stronger formalization of this connection will help us to both develop better boosting algorithms and understand their limits.
 
 
 \bibliographystyle{alpha}
 \bibliography{references}
-
+\iffalse
 \section*{Appendix}
 
 \subsection*{Proof of \hyperref[t-2-2]{Theorem 2.2}}
@@ -619,6 +627,6 @@ To complete the proof, we need to deal with the fact that we don't know which bl
     \end{equation*}
     For each $j \in [n^4]$, choose a random $\cS$ and construct the circuit $C_\cS^{(j)}$ using the process above. To test whether this circuit computes $f$ to an accuracy of $1 - \sfrac{1}{n}$, we can query $\poly(n)$ many examples $(x, f(x))$ and test whether it computes a roughly $1 - \sfrac{1}{n}$ fraction of them correctly. For any $j \in [n^4]$, if $j$ is the good block, this process will output a good circuit for $f$ with very high probability. Thus, since at least one block is good, repeating the process above for every block will output at least one circuit computing $f$ to accuracy $1 - \sfrac{1}{n}$ with high probability. Thus, we can strongly learn $\cF$.
 \end{proof}
-
+\fi
 
 \end{document}
